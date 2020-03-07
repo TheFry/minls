@@ -7,12 +7,26 @@
 0x5A4D minix magic number on a byte-reversed filesystem
 64 size of an inode in bytes
 64 size of a directory entry in bytes
+
+
+0170000 File type mask
+0100000 Regular file
+0040000 Directory
+0000400 Owner read permission
+0000200 Owner write permission
+0000100 Owner execute permission
+0000040 Group read permission
+0000020 Group write permission
+0000010 Group execute permission
+0000004 Other read permission
+0000002 Other write permission
+0000001 Other execute permission
 */
 
 
 #define T_PATH ./test_fs
 #include <stdint.h>
-struct superblock
+struct __attribute__ ((__packed__))superblock
 { 
   /* Minix Version 3 Superblock
    *_this structure found in fs/super.h
@@ -38,7 +52,8 @@ struct superblock
 
 /* Minix inode */
 #define DIRECT_ZONES 7
-struct inode {
+struct __attribute__ ((__packed__))inode 
+{
    uint16_t mode; /* mode */
    uint16_t links; /* number or links */
    uint16_t uid;
