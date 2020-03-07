@@ -26,9 +26,8 @@
 
 #define T_PATH "./test_fs"
 #define SB_LOCATION 1024
-#define PT_LOCATION 446
+#define PT_LOCATION 0x1BE
 #define SECTOR_SIZE 512
-#define PT_ENTRY_SIZE (SECTOR_SIZE - PT_LOCATION)
 #include <stdint.h>
 struct __attribute__ ((__packed__))superblock
 { 
@@ -73,8 +72,8 @@ struct __attribute__ ((__packed__))inode
 };
 
 
-/* Partition table */
-struct __attribute__ ((__packed__ )) partition_table
+/* Partition table entry */
+struct __attribute__ ((__packed__ )) pt_entry
 {
    uint8_t bootind;      /* Magic boot number (0x80 if bootable) */
    uint8_t start_head;   /* Start of partition in CHS */
@@ -86,4 +85,10 @@ struct __attribute__ ((__packed__ )) partition_table
    uint8_t end_cyl;
    uint32_t lFirst;       /* First sector with LBA addressing */
    uint32_t size;         /* size of partition in sectors */
+};
+
+struct __attribute__ ((__packed__ )) dirent
+{
+   uint32_t inumber;
+   char name[60];
 };
