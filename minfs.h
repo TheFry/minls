@@ -24,7 +24,7 @@
 */
 
 
-#define T_PATH ./test_fs
+#define T_PATH "./test_fs"
 #include <stdint.h>
 struct __attribute__ ((__packed__))superblock
 { 
