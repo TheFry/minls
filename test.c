@@ -9,7 +9,11 @@ int main(int argc, char* argv[])
    size_t b_read;
    struct superblock sb;
    struct partition_table pt;
-   disk = fopen(T_PATH, "r");
+   disk = fopen("//home/pn-cs453/Given/Asgn5/Images/HardDisk", "r");
+   if(disk == NULL)
+   {
+      perror("fopen");
+   }
    if(fseek(disk, 1024, SEEK_SET))
    {
       perror("fseek");
@@ -20,10 +24,9 @@ int main(int argc, char* argv[])
       perror("fseek");
    }
    b_read = fread(&pt, sizeof(struct partition_table), 1, disk);
-
    printf("Superblock Contents:\n");
-   printf("ninodes:\t\t%d\n", sb.ninodes);
-   printf("i_blocks:\t\t%d\n", sb.i_blocks);
+   printf("ninodes:\t\t%zd\n", sb.ninodes);
+   printf("i_blocks:\t\t%zd\n", sb.i_blocks);
    printf("z_blocks:\t\t%d\n", sb.z_blocks);
    printf("firstdata:\t\t%d\n", sb.firstdata);
    printf("log_zone_size:\t\t%d\n", sb.log_zone_size);
