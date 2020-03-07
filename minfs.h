@@ -27,6 +27,8 @@
 #define T_PATH "./test_fs"
 #define SB_LOCATION 1024
 #define PT_LOCATION 446
+#define SECTOR_SIZE 512
+#define PT_ENTRY_SIZE (SECTOR_SIZE - PT_LOCATION)
 #include <stdint.h>
 struct __attribute__ ((__packed__))superblock
 { 
