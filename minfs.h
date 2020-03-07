@@ -25,6 +25,8 @@
 
 
 #define T_PATH "./test_fs"
+#define SB_LOCATION 1024
+#define PT_LOCATION 446
 #include <stdint.h>
 struct __attribute__ ((__packed__))superblock
 { 
@@ -66,4 +68,20 @@ struct __attribute__ ((__packed__))inode
    uint32_t indirect;
    uint32_t two_indirect;
    uint32_t unused;
+};
+
+
+/* Partition table */
+struct __attribute__ ((__packed__ )) partition_table
+{
+   uint8_t bootind;      /* Magic boot number (0x80 if bootable) */
+   uint8_t start_head;   /* Start of partition in CHS */
+   uint8_t start_sec;
+   uint8_t start_cyl;    /* Type of partition, 0x81 if minix */
+   uint8_t type;         /* Type of partition, 0x81 if minix */
+   uint8_t end_head;     /* End of partition in CHS */
+   uint8_t end_sec;
+   uint8_t end_cyl;
+   uint32_t lFirst;       /* First sector with LBA addressing */
+   uint32_t size;         /* size of partition in sectors */
 };
