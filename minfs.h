@@ -23,7 +23,6 @@
 0000001 Other execute permission
 */
 
-
 #define T_PATH "./test_fs"
 #define SB_OFFSET 1024
 #define PT_OFFSET 0x1BE
@@ -32,13 +31,14 @@
 #define SECTOR_SIZE 512
 #define ROOT_INODE 1
 #define MINIX_PART_TYPE 0x81
-#define PT_MAGIC_NUM_2BYTE 0xAA5
+#define PT_MAGIC_NUM 0xAA55
 #define MINIX_MAGIC_NUM 0x4D5A
 #define INODE_SIZE 64
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
 
 #include <stdint.h>
+extern uint32_t fs_base;
 struct __attribute__ ((__packed__))superblock
 { 
   /* Minix Version 3 Superblock
