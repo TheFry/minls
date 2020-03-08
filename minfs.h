@@ -29,6 +29,12 @@
 #define PT_LOCATION 0x1BE
 #define SECTOR_SIZE 512
 #define ROOT_INODE 1
+#define MINIX_PART_TYPE 0x81
+#define PT_MAGIC_NUM_2BYTE 0xAA5
+#define MINIX_MAGIC_NUM 0x4D5A
+#define INODE_SIZE 64
+#define DIRENT_SIZE 64
+
 #include <stdint.h>
 struct __attribute__ ((__packed__))superblock
 { 
