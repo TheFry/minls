@@ -28,6 +28,7 @@
 #define SB_LOCATION 1024
 #define PT_LOCATION 0x1BE
 #define SECTOR_SIZE 512
+#define ROOT_INODE 1
 #include <stdint.h>
 struct __attribute__ ((__packed__))superblock
 { 
