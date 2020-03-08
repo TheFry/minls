@@ -36,6 +36,7 @@
 #define MINIX_MAGIC_NUM 0x4D5A
 #define INODE_SIZE 64
 #define DIRENT_SIZE 64
+#define PT_MAGIC_NUM_OFFSET 510
 
 #include <stdint.h>
 struct __attribute__ ((__packed__))superblock
