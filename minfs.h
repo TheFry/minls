@@ -36,6 +36,7 @@
 #define INODE_SIZE 64
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
+#define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
 
 #include <stdint.h>
 extern uint32_t fs_base;
