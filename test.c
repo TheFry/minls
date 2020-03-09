@@ -194,24 +194,40 @@ void peek_fs()
    printf("%s's inode: %d\n", file.name, file.inumber);
 }
 
-Options opts = {FALSE, -1, -1, ""};
-int parse_options(int argc, char* argv[])
+void print_usage(char* name, int type)
 {
-   char ret;
-   char* optstring = "p:s:v";
-   if(argc == 1)
+   if(type == TYPE_MINLS)
    {
       fprintf(stderr,
          "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n",
-            argv[0]);
-      fprintf(stderr,"Options:\n");
+            name);
+   }
+   else if(type == TYPE_MINGET)
+   {
       fprintf(stderr,
-         "\t-p\t part\t --- select partition for filesystem (default: none)\n");
-      fprintf(stderr,
-         "\t-s\t sub\t --- select subpartition for filesystem (default: none)\n");
-      fprintf(stderr,"\t-h\t help\t --- print usage information and exit\n");
-      fprintf(stderr,"\t-v\t verbose --- increase verbosity level\n");
-      return FALSE;
+         "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile "
+         "srcpath [ dstpath ]\n", name);
+   }
+   fprintf(stderr,"Options:\n");
+   fprintf(stderr,
+      "\t-p\t part\t --- select partition for filesystem (default: none)\n");
+   fprintf(stderr,
+      "\t-s\t sub\t --- select subpartition for filesystem (default: none)\n");
+   fprintf(stderr,"\t-h\t help\t --- print usage information and exit\n");
+   fprintf(stderr,"\t-v\t verbose --- increase verbosity level\n");
+}
+
+Options opts = {FALSE, -1, -1, "", "", ""};
+
+int parse_options(int argc, char* argv[], int type)
+{
+   char ret;
+   char* optstring = "-p:s:v";
+   int str_arg = 0;
+   if(argc == 1)
+   {
+      print_usage(argv[0], type);
+      exit(EXIT_FAILURE);
    }
    while((ret = getopt(argc, argv, optstring)) != -1)
    {
@@ -222,21 +238,70 @@ int parse_options(int argc, char* argv[])
       else if(ret == 'p')
       {
          opts.part = (int) strtol(optarg, NULL, 10);
+         if(opts.part > 3 || opts.part < 0)
+         {
+            fprintf(stderr, "Partition %d out of range. Must be 0..3.\n",
+               opts.part);
+            print_usage(argv[0], type);
+            exit(EXIT_FAILURE);
+         }  
       }
       else if(ret == 's')
       {
          opts.subpart = (int) strtol(optarg, NULL, 10);
+         if(opts.subpart > 3 || opts.subpart < 0)
+         {
+            fprintf(stderr, "Subpartition %d out of range. Must be 0..3.\n",
+               opts.subpart);
+            print_usage(argv[0], type);
+            exit(EXIT_FAILURE);
+         }
       }
-      
+      else if(ret == 'h')
+      {
+         print_usage(argv[0], type);
+         exit(EXIT_FAILURE);
+      }
+      else if(ret == 1)
+      {
+         if(str_arg == 0)
+         {
+            opts.image = optarg;
+            str_arg++;
+         }
+         else if(str_arg == 1)
+         {
+            opts.srcpath = optarg;
+            str_arg++;
+         }
+         else if(str_arg == 2 && type == TYPE_MINGET)
+         {
+            opts.dstpath = optarg;
+            str_arg++;
+         }
+         else
+         {
+            fprintf(stderr, "Too many args...\n");
+            print_usage(argv[0], type);
+            exit(EXIT_FAILURE);
+         }
+      }
+      else
+      {
+         print_usage(argv[0], type);
+         exit(EXIT_FAILURE);
+      }
    }
    printf("Verbose: %d\n", opts.verbose);
    printf("Part: %d\n", opts.part);
    printf("SubPart: %d\n", opts.subpart);
+   printf("Image: %s\n", opts.image);
+   printf("Path: %s\n", opts.srcpath);
+   printf("Dest: %s\n", opts.dstpath);
 }
 
 int main(int argc, char* argv[])
 {
-   parse_options(argc, argv);
+   parse_options(argc, argv, TYPE_MINGET);
    return 0;
 }
-

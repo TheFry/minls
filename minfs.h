@@ -37,6 +37,10 @@
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
 #define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
+#define TRUE 1 
+#define FALSE 0
+#define TYPE_MINLS 0x10
+#define TYPE_MINGET 0x20
 
 #include <stdint.h>
 extern uint32_t fs_base;
@@ -103,3 +107,16 @@ struct __attribute__ ((__packed__ )) dirent
    uint32_t inumber;
    char name[60];
 };
+
+typedef struct opts
+{
+   short verbose;
+   int part;
+   int subpart;
+   char* srcpath;
+   char* dstpath;
+   char* image;
+} Options;
+
+void print_usage(char* name, int type);
+void parse_options(int argc, char* argv[], int type, Options* opts);
