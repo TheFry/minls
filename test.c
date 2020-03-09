@@ -1,6 +1,10 @@
 #include <stdio.h>
+#include <getopt.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include "minfs.h"
+
+uint32_t fs_base = 0;
 
 void farty_partitions()
 {
@@ -127,7 +131,7 @@ void farty_partitions()
 
 }
 
-int main(int argc, char* argv[])
+void peek_fs()
 {
    FILE * disk;
    uint32_t magic;
@@ -136,12 +140,13 @@ int main(int argc, char* argv[])
    struct inode root;
    struct dirent file;
    size_t offset;
+   size_t zone_offset;
    disk = fopen(T_PATH, "r");
    if(disk == NULL)
    {
       perror("fopen");
    }
-   if(fseek(disk, 1024, SEEK_SET))
+   if(fseek(disk, SB_LOCATION, SEEK_SET))
    {
       perror("fseek");
    }
@@ -159,6 +164,7 @@ int main(int argc, char* argv[])
    printf("magic:\t\t\t0x%X\n", sb.magic);
    printf("blocksize:\t\t%d\n", sb.blocksize);
    printf("subversion:\t\t%d\n", sb.subversion);
+
    offset = (2 + sb.i_blocks + sb.z_blocks) * sb.blocksize;
    fseek(disk, offset, SEEK_SET);
    fread(&root, sizeof(struct inode), 1, disk);
@@ -169,6 +175,68 @@ int main(int argc, char* argv[])
    printf("size:\t\t%d\n", root.size);
 
    printf("Zone[0]:\t%d\n", root.zone[0]);
+   
+   zone_offset = sb.firstdata * (sb.blocksize << sb.log_zone_size);
+   fseek(disk, zone_offset, SEEK_SET);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+}
+
+Options opts = {FALSE, -1, -1, ""};
+int parse_options(int argc, char* argv[])
+{
+   char ret;
+   char* optstring = "p:s:v";
+   if(argc == 1)
+   {
+      fprintf(stderr,
+         "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n",
+            argv[0]);
+      fprintf(stderr,"Options:\n");
+      fprintf(stderr,
+         "\t-p\t part\t --- select partition for filesystem (default: none)\n");
+      fprintf(stderr,
+         "\t-s\t sub\t --- select subpartition for filesystem (default: none)\n");
+      fprintf(stderr,"\t-h\t help\t --- print usage information and exit\n");
+      fprintf(stderr,"\t-v\t verbose --- increase verbosity level\n");
+      return FALSE;
+   }
+   while((ret = getopt(argc, argv, optstring)) != -1)
+   {
+      if(ret == 'v')
+      {
+         opts.verbose = TRUE;
+      }
+      else if(ret == 'p')
+      {
+         opts.part = (int) strtol(optarg, NULL, 10);
+      }
+      else if(ret == 's')
+      {
+         opts.subpart = (int) strtol(optarg, NULL, 10);
+      }
+      
+   }
+   printf("Verbose: %d\n", opts.verbose);
+   printf("Part: %d\n", opts.part);
+   printf("SubPart: %d\n", opts.subpart);
+}
+
+int main(int argc, char* argv[])
+{
+   parse_options(argc, argv);
    return 0;
 }
 
