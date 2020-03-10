@@ -26,8 +26,10 @@
 #define T_PATH "./test_fs"
 #define SB_OFFSET 1024
 #define PT_OFFSET 0x1BE
-#define SB_LOCATION (fs_base + SB_OFFSET)
-#define PT_LOCATION (fs_base + PT_OFFSET)
+/* Use this whenever reading the superblock */
+#define SB_BASE (fs_base + SB_OFFSET)
+/* Use this whenever reading the partition table */
+#define PT_BASE (fs_base + PT_OFFSET)
 #define SECTOR_SIZE 512
 #define ROOT_INODE 1
 #define MINIX_PART_TYPE 0x81

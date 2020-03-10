@@ -4,11 +4,13 @@
 #include <getopt.h>
 #include "minfs.h"
 
-uint32_t fs_base = 0;
+uint32_t fs_base = 512;
 
 int main(int argc, char* argv[])
 {
    Options opts;
    parse_options(argc, argv, TYPE_MINLS, &opts);
+   printf("SuperBlock location: %d\n", SB_BASE);
+   printf("Partition Table location: 0x%X\n", PT_BASE);
    return 0;
 }
