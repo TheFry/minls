@@ -115,7 +115,7 @@ typedef struct opts
    short verbose;
    int part;
    int subpart;
-   char* srcpath;
+   char* srcpath; /* This is where path gets put for minls */
    char* dstpath;
    char* image;
 } Options;
