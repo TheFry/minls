@@ -12,7 +12,7 @@ extern struct superblock super_block;
   * This function treat fs_base as the begining of a partition
   * AKA a partition table 
 */
-int get_fs(int pt_num, int spt_num)
+int get_fs(int pt_num)
 {
    struct pt_entry pt;
    uint32_t table_offset;
@@ -27,7 +27,7 @@ int get_fs(int pt_num, int spt_num)
       perror("fseek primary partiton");
    }
 
-   if(fread(&valid_pt, sizeof(valid_pt), 1, disk))
+   if(fread(&valid_pt, sizeof(valid_pt), 1, disk) != 1)
    {
       perror("fread primary partition");
    }
@@ -37,7 +37,6 @@ int get_fs(int pt_num, int spt_num)
       perror("Not a valid partition table");
       exit(EXIT_FAILURE);
    }
-
    
    /** Now get the PT entry, check the fs type */
    if(fseek(disk, table_offset, SEEK_SET))
@@ -45,7 +44,7 @@ int get_fs(int pt_num, int spt_num)
       perror("fseek primary partiton");
    }
    
-   if(fread(&pt, sizeof(struct pt_entry), 1, disk))
+   if(fread(&pt, sizeof(struct pt_entry), 1, disk) != 1)
    {
       perror("fread primary partition");
    }
