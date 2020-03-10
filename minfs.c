@@ -12,7 +12,7 @@ extern struct superblock super_block;
   * This function treat fs_base as the begining of a partition
   * AKA a partition table 
 */
-int get_fs(int pt_num)
+uint32_t get_fs(int pt_num)
 {
    struct pt_entry pt;
    uint32_t table_offset;
@@ -25,16 +25,18 @@ int get_fs(int pt_num)
    if(fseek(disk, PT_MAGIC_NUM_LOCATION, SEEK_SET))
    {
       perror("fseek primary partiton");
+      exit(EXIT_FAILURE);
    }
 
    if(fread(&valid_pt, sizeof(valid_pt), 1, disk) != 1)
    {
       perror("fread primary partition");
+      exit(EXIT_FAILURE);
    }
 
    /* Test them */
    if(valid_pt != PT_MAGIC_NUM){
-      perror("Not a valid partition table");
+      fprintf(stderr, "Not a valid partition table\n");
       exit(EXIT_FAILURE);
    }
    
@@ -42,14 +44,17 @@ int get_fs(int pt_num)
    if(fseek(disk, table_offset, SEEK_SET))
    {
       perror("fseek primary partiton");
+      exit(EXIT_FAILURE);
    }
    
    if(fread(&pt, sizeof(struct pt_entry), 1, disk) != 1)
    {
       perror("fread primary partition");
+      exit(EXIT_FAILURE);
    }
 
    if(pt.type != MINIX_PART_TYPE){
+
       fprintf(stderr, "Not a valid minix partition\n");
       exit(EXIT_FAILURE);
    }
@@ -69,7 +74,9 @@ void get_inode(int num, FILE* disk, struct inode* data)
 }
 
 /** Prints the file mode
- * ( it's disgusting I'm sorry :-[ )
+ * ( it's disgusting I'm sorry :-[ ) -David
+ * 
+ * Apology not accepted -Luke
  */
 void print_mode(uint16_t mode)
 {
