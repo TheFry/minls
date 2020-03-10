@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "minfs.h"
 
+extern uint32_t fs_base;
 /*
 static uint32_t fs_base;
 static FS *disk;
@@ -170,4 +171,6 @@ void parse_options(int argc, char* argv[], int type, Options* opts)
       print_usage(argv[0], type);
       exit(EXIT_FAILURE);
    }
+   printf("(from minfs.c) Superblock Base: %d\n", SB_BASE);
+   fs_base = 0;
 }
