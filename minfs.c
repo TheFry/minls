@@ -164,4 +164,10 @@ void parse_options(int argc, char* argv[], int type, Options* opts)
          exit(EXIT_FAILURE);
       }
    }
+   if(opts->subpart >= 0 && opts->part < 0)
+   {
+      fprintf(stderr, "Cannot have a subpartition without a partition\n");
+      print_usage(argv[0], type);
+      exit(EXIT_FAILURE);
+   }
 }
