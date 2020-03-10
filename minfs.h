@@ -49,7 +49,6 @@
 #define INODE_SIZE 64
 #define INODE_TABLE_OFFSET (fs_base + (STATIC_BLOCKS + super_block.i_blocks + \
 super_block.z_blocks) * super_block.blocksize)
-#define ROOT_INODE_ADDRESS INODE_TABLE_OFFSET
 #define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + (x - 1) * INODE_SIZE)
 #define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
 #define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * x))
@@ -143,5 +142,7 @@ void print_usage(char* name, int type);
 void parse_options(int argc, char* argv[], int type, Options* opts);
 void print_mode(uint16_t mode);
 void get_inode(int num, struct inode* data);
-uint32_t get_fs(int pt_num);
+uint32_t get_part(int pt_num);
+void find_fs(Options opts);
 void ls(struct inode dir);
+void load_superblock();

@@ -8,11 +8,38 @@ extern uint32_t fs_base;
 extern FILE *disk;
 extern struct superblock super_block;
 
+void load_superblock()
+{
+   fseek(disk, SB_BASE, SEEK_SET);
+   fread(&super_block, sizeof(struct superblock), 1, disk);
+   if(super_block.magic != MINIX_MAGIC_NUM)
+   {
+      fprintf(stderr, "Bad magic number. (0x%04X)\n", super_block.magic);
+      fprintf(stderr, "This doesn't look like a MINIX filesystem.\n");
+      exit(EXIT_FAILURE);
+   }
+}
+
+void find_fs(Options opts)
+{
+   uint32_t lFirst;
+   if(opts.part >= 0)
+   {
+      lFirst = get_part(opts.part);
+      fs_base = (SECTOR_SIZE * lFirst);
+   }
+   if(opts.subpart >= 0)
+   {
+      lFirst = get_part(opts.subpart);
+      fs_base = (SECTOR_SIZE * lFirst);
+   }
+}
+
 /** MAKE SURE fs_base HAS BEEN SET! 
   * This function treat fs_base as the begining of a partition
   * AKA a partition table 
 */
-uint32_t get_fs(int pt_num)
+uint32_t get_part(int pt_num)
 {
    struct pt_entry pt;
    uint32_t table_offset;
@@ -72,7 +99,6 @@ void ls(struct inode dir)
    struct dirent *directory;
    struct inode file;
    entries = dir.size / DIRENT_SIZE;
-   printf("Entries: %d\n", entries);
    directory = malloc(ZONE_SIZE);
    if(fseek(disk, ADDRESS_OF_ZONE(dir.zone[0]), SEEK_SET))
    {
@@ -306,6 +332,5 @@ void parse_options(int argc, char* argv[], int type, Options* opts)
       print_usage(argv[0], type);
       exit(EXIT_FAILURE);
    }
-   printf("(from minfs.c) Superblock Base: %d\n", SB_BASE);
    fs_base = 0;
 }
