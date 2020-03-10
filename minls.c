@@ -12,6 +12,11 @@ int main(int argc, char* argv[])
    parse_options(argc, argv, TYPE_MINLS, &opts);
    printf("(from minls) SuperBlock location: %d\n", SB_BASE);
    printf("(from minls) Partition Table location: 0x%X\n", PT_BASE);
-   disk = fopen(opts.srcpath, "r");
+   printf("%s\n", opts.srcpath);
+   disk = fopen(opts.image, "r");
+   if(disk == NULL){
+      perror("Oops");
+   }
+   get_fs(opts.part);
    return 0;
 }
