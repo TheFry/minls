@@ -58,6 +58,102 @@ int get_fs(int pt_num)
    return pt.lFirst;
 }
 
+/** Gets the inode based on a 1-indexed number.
+ * Populates 'data' with the inode data
+ */
+void get_inode(int num, FILE* disk, struct inode* data)
+{
+   int offset = ADDRESS_OF_INODE(num);
+   fseek(disk, offset, SEEK_SET);
+   fread(data, INODE_SIZE, 1, disk);
+}
+
+/** Prints the file mode
+ * ( it's disgusting I'm sorry :-[ )
+ */
+void print_mode(uint16_t mode)
+{
+   if(mode & MODE_DIR) 
+   {
+      printf("d");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_OR) 
+   {
+      printf("r");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_OW) 
+   {
+      printf("w");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_OX) 
+   {
+      printf("x");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_GR) 
+   {
+      printf("r");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_GW) 
+   {
+      printf("w");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_GX) 
+   {
+      printf("x");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_WR) 
+   {
+      printf("r");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_WW) 
+   {
+      printf("w");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_WX) 
+   {
+      printf("x");
+   }
+   else
+   {
+      printf("-");
+   }
+}
 /** Prints usage message. 
  * type is either TYPE_MINLS or TYPE_MINGET
  * name is always argv[0]
