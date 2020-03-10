@@ -21,7 +21,7 @@ minfs.o: minfs.c minfs.h
 test: test.o
 	$(CC) $(CFLAGS) -o test test.o
 
-test.o: test.c
+test.o: test.c minfs.h
 	$(CC) $(CLFAGS) -c test.c
 
 clean:

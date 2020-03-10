@@ -31,11 +31,16 @@
 /* Use this whenever reading the partition table */
 #define PT_BASE (fs_base + PT_OFFSET)
 #define SECTOR_SIZE 512
+#define STATIC_BLOCKS 2
 #define ROOT_INODE 1
 #define MINIX_PART_TYPE 0x81
 #define PT_MAGIC_NUM 0xAA55
 #define MINIX_MAGIC_NUM 0x4D5A
 #define INODE_SIZE 64
+#define INODE_TABLE_OFFSET ((STATIC_BLOCKS + super_block.i_blocks + \
+super_block.z_blocks) * super_block.blocksize)
+#define ROOT_INODE_ADDRESS INODE_TABLE_OFFSET
+#define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + x * INODE_SIZE)
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
 #define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
@@ -47,7 +52,7 @@
 #include <stdint.h>
 extern uint32_t fs_base;
 extern FILE *disk;
-extern superblock super_block;
+extern struct superblock super_block;
 struct __attribute__ ((__packed__))superblock
 { 
   /* Minix Version 3 Superblock

@@ -5,6 +5,7 @@
 #include "minfs.h"
 
 uint32_t fs_base = 0;
+struct superblock super_block;
 
 void farty_partitions()
 {
@@ -14,7 +15,7 @@ void farty_partitions()
    uint8_t m2;
    uint16_t sig;
    size_t b_read;
-   struct superblock sb;
+   struct superblock super_block;
    struct pt_entry pt;
    disk = fopen("//home/pn-cs453/Given/Asgn5/Images/HardDisk", "r");
    if(disk == NULL)
@@ -25,8 +26,8 @@ void farty_partitions()
    {
       perror("fseek");
    }
-   b_read = fread(&sb, sizeof(struct superblock), 1, disk);
-   if(fseek(disk, PT_LOCATION, SEEK_SET))
+   b_read = fread(&super_block, sizeof(struct superblock), 1, disk);
+   if(fseek(disk, PT_BASE, SEEK_SET))
    {
       perror("fseek");
    }
@@ -41,16 +42,16 @@ void farty_partitions()
 
    printf("FROM START OF DISK\n");
    printf("GARBAGE Superblock Contents:\n");
-   printf("ninodes:\t\t%zd\n", sb.ninodes);
-   printf("i_blocks:\t\t%zd\n", sb.i_blocks);
-   printf("z_blocks:\t\t%d\n", sb.z_blocks);
-   printf("firstdata:\t\t%d\n", sb.firstdata);
-   printf("log_zone_size:\t\t%d\n", sb.log_zone_size);
-   printf("max_file:\t\t%ld\n", sb.max_file);
-   printf("zones:\t\t\t%d\n", sb.zones);
-   printf("magic:\t\t\t0x%X\n", sb.magic);
-   printf("blocksize:\t\t%d\n", sb.blocksize);
-   printf("subversion:\t\t%d\n", sb.subversion);
+   printf("ninodes:\t\t%zd\n", super_block.ninodes);
+   printf("i_blocks:\t\t%zd\n", super_block.i_blocks);
+   printf("z_blocks:\t\t%d\n", super_block.z_blocks);
+   printf("firstdata:\t\t%d\n", super_block.firstdata);
+   printf("log_zone_size:\t\t%d\n", super_block.log_zone_size);
+   printf("max_file:\t\t%ld\n", super_block.max_file);
+   printf("zones:\t\t\t%d\n", super_block.zones);
+   printf("magic:\t\t\t0x%X\n", super_block.magic);
+   printf("blocksize:\t\t%d\n", super_block.blocksize);
+   printf("subversion:\t\t%d\n", super_block.subversion);
    printf("\nPT, Partition 0\n");
    printf("Magic #:\t\t0x%X\n", pt.bootind);
    printf("Type:\t\t\t0x%X\n", pt.type);
@@ -61,7 +62,7 @@ void farty_partitions()
    printf("M1: 0x%X\nM2: 0x%X\n", m1, m2);
    // Read from partition 0
    printf("\n\nPARTITION 0:\n");
-   if(fseek(disk, PT_LOCATION+SECTOR_SIZE*17, SEEK_SET))
+   if(fseek(disk, PT_BASE+SECTOR_SIZE*17, SEEK_SET))
    {
       perror("fseek");
    }
@@ -84,39 +85,39 @@ void farty_partitions()
    printf("Type:\t\t\t0x%X\n", pt.type);
    printf("lFirst:\t\t\t%zd\n", pt.lFirst);
    printf("size:\t\t\t%zd\n", pt.size);
-   if(fseek(disk, SB_LOCATION + SECTOR_SIZE*18, SEEK_SET))
+   if(fseek(disk, SB_BASE + SECTOR_SIZE*18, SEEK_SET))
    {
       perror("fseek");
    }
 
-   b_read = fread(&sb, sizeof(struct superblock), 1, disk);
+   b_read = fread(&super_block, sizeof(struct superblock), 1, disk);
    printf("\nSuperblock Contents of Subpart 0 (sector 18):\n");
-   printf("ninodes:\t\t%zd\n", sb.ninodes);
-   printf("i_blocks:\t\t%zd\n", sb.i_blocks);
-   printf("z_blocks:\t\t%d\n", sb.z_blocks);
-   printf("firstdata:\t\t%d\n", sb.firstdata);
-   printf("log_zone_size:\t\t%d\n", sb.log_zone_size);
-   printf("max_file:\t\t%ld\n", sb.max_file);
-   printf("zones:\t\t\t%d\n", sb.zones);
-   printf("magic:\t\t\t0x%X\n", sb.magic);
-   printf("blocksize:\t\t%d\n", sb.blocksize);
-   printf("subversion:\t\t%d\n", sb.subversion);
-   if(fseek(disk, SB_LOCATION + SECTOR_SIZE*2898, SEEK_SET))
+   printf("ninodes:\t\t%zd\n", super_block.ninodes);
+   printf("i_blocks:\t\t%zd\n", super_block.i_blocks);
+   printf("z_blocks:\t\t%d\n", super_block.z_blocks);
+   printf("firstdata:\t\t%d\n", super_block.firstdata);
+   printf("log_zone_size:\t\t%d\n", super_block.log_zone_size);
+   printf("max_file:\t\t%ld\n", super_block.max_file);
+   printf("zones:\t\t\t%d\n", super_block.zones);
+   printf("magic:\t\t\t0x%X\n", super_block.magic);
+   printf("blocksize:\t\t%d\n", super_block.blocksize);
+   printf("subversion:\t\t%d\n", super_block.subversion);
+   if(fseek(disk, SB_BASE + SECTOR_SIZE*2898, SEEK_SET))
    {
       perror("fseek");
    }
-   b_read = fread(&sb, sizeof(struct superblock), 1, disk);
+   b_read = fread(&super_block, sizeof(struct superblock), 1, disk);
    printf("\nSuperblock Contents of Subpart 2 (sector 2898):\n");
-   printf("ninodes:\t\t%zd\n", sb.ninodes);
-   printf("i_blocks:\t\t%zd\n", sb.i_blocks);
-   printf("z_blocks:\t\t%d\n", sb.z_blocks);
-   printf("firstdata:\t\t%d\n", sb.firstdata);
-   printf("log_zone_size:\t\t%d\n", sb.log_zone_size);
-   printf("max_file:\t\t%ld\n", sb.max_file);
-   printf("zones:\t\t\t%d\n", sb.zones);
-   printf("magic:\t\t\t0x%X\n", sb.magic);
-   printf("blocksize:\t\t%d\n", sb.blocksize);
-   printf("subversion:\t\t%d\n", sb.subversion);
+   printf("ninodes:\t\t%zd\n", super_block.ninodes);
+   printf("i_blocks:\t\t%zd\n", super_block.i_blocks);
+   printf("z_blocks:\t\t%d\n", super_block.z_blocks);
+   printf("firstdata:\t\t%d\n", super_block.firstdata);
+   printf("log_zone_size:\t\t%d\n", super_block.log_zone_size);
+   printf("max_file:\t\t%ld\n", super_block.max_file);
+   printf("zones:\t\t\t%d\n", super_block.zones);
+   printf("magic:\t\t\t0x%X\n", super_block.magic);
+   printf("blocksize:\t\t%d\n", super_block.blocksize);
+   printf("subversion:\t\t%d\n", super_block.subversion);
    if(fseek(disk, 510 + SECTOR_SIZE*17, SEEK_SET))
    {
       perror("fseek");
@@ -131,12 +132,19 @@ void farty_partitions()
 
 }
 
+void get_inode(int num, FILE* disk, struct inode* data)
+{
+   int offset = ADDRESS_OF_INODE(num);
+   printf("offset %d\n", offset);
+   fseek(disk, offset, SEEK_SET);
+   fread(data, INODE_SIZE, 1, disk);
+}
+
 void peek_fs()
 {
    FILE * disk;
    uint32_t magic;
    size_t b_read;
-   struct superblock sb;
    struct inode root;
    struct dirent file;
    size_t offset;
@@ -146,28 +154,26 @@ void peek_fs()
    {
       perror("fopen");
    }
-   if(fseek(disk, SB_LOCATION, SEEK_SET))
+   if(fseek(disk, SB_BASE, SEEK_SET))
    {
       perror("fseek");
    }
-   b_read = fread(&sb, sizeof(struct superblock), 1, disk);
+   b_read = fread(&super_block, sizeof(struct superblock), 1, disk);
 
    printf("FROM START OF DISK\n");
    printf("Superblock Contents:\n");
-   printf("ninodes:\t\t%zd\n", sb.ninodes);
-   printf("i_blocks:\t\t%zd\n", sb.i_blocks);
-   printf("z_blocks:\t\t%d\n", sb.z_blocks);
-   printf("firstdata:\t\t%d\n", sb.firstdata);
-   printf("log_zone_size:\t\t%d\n", sb.log_zone_size);
-   printf("max_file:\t\t%ld\n", sb.max_file);
-   printf("zones:\t\t\t%d\n", sb.zones);
-   printf("magic:\t\t\t0x%X\n", sb.magic);
-   printf("blocksize:\t\t%d\n", sb.blocksize);
-   printf("subversion:\t\t%d\n", sb.subversion);
+   printf("ninodes:\t\t%zd\n", super_block.ninodes);
+   printf("i_blocks:\t\t%zd\n", super_block.i_blocks);
+   printf("z_blocks:\t\t%d\n", super_block.z_blocks);
+   printf("firstdata:\t\t%d\n", super_block.firstdata);
+   printf("log_zone_size:\t\t%d\n", super_block.log_zone_size);
+   printf("max_file:\t\t%ld\n", super_block.max_file);
+   printf("zones:\t\t\t%d\n", super_block.zones);
+   printf("magic:\t\t\t0x%X\n", super_block.magic);
+   printf("blocksize:\t\t%d\n", super_block.blocksize);
+   printf("subversion:\t\t%d\n", super_block.subversion);
 
-   offset = (2 + sb.i_blocks + sb.z_blocks) * sb.blocksize;
-   fseek(disk, offset, SEEK_SET);
-   fread(&root, sizeof(struct inode), 1, disk);
+   get_inode(0, disk, &root);
 
    printf("Root Inode:\n");
    printf("Mode:\t\t0x%X\n", root.mode);
@@ -176,7 +182,7 @@ void peek_fs()
 
    printf("Zone[0]:\t%d\n", root.zone[0]);
    
-   zone_offset = sb.firstdata * (sb.blocksize << sb.log_zone_size);
+   zone_offset = super_block.firstdata * (super_block.blocksize << super_block.log_zone_size);
    fseek(disk, zone_offset, SEEK_SET);
    fread(&file, sizeof(struct dirent), 1, disk);
    printf("%s's inode: %d\n", file.name, file.inumber);
@@ -194,114 +200,8 @@ void peek_fs()
    printf("%s's inode: %d\n", file.name, file.inumber);
 }
 
-void print_usage(char* name, int type)
-{
-   if(type == TYPE_MINLS)
-   {
-      fprintf(stderr,
-         "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n",
-            name);
-   }
-   else if(type == TYPE_MINGET)
-   {
-      fprintf(stderr,
-         "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile "
-         "srcpath [ dstpath ]\n", name);
-   }
-   fprintf(stderr,"Options:\n");
-   fprintf(stderr,
-      "\t-p\t part\t --- select partition for filesystem (default: none)\n");
-   fprintf(stderr,
-      "\t-s\t sub\t --- select subpartition for filesystem (default: none)\n");
-   fprintf(stderr,"\t-h\t help\t --- print usage information and exit\n");
-   fprintf(stderr,"\t-v\t verbose --- increase verbosity level\n");
-}
-
-Options opts = {FALSE, -1, -1, "", "", ""};
-
-int parse_options(int argc, char* argv[], int type)
-{
-   char ret;
-   char* optstring = "-p:s:v";
-   int str_arg = 0;
-   if(argc == 1)
-   {
-      print_usage(argv[0], type);
-      exit(EXIT_FAILURE);
-   }
-   while((ret = getopt(argc, argv, optstring)) != -1)
-   {
-      if(ret == 'v')
-      {
-         opts.verbose = TRUE;
-      }
-      else if(ret == 'p')
-      {
-         opts.part = (int) strtol(optarg, NULL, 10);
-         if(opts.part > 3 || opts.part < 0)
-         {
-            fprintf(stderr, "Partition %d out of range. Must be 0..3.\n",
-               opts.part);
-            print_usage(argv[0], type);
-            exit(EXIT_FAILURE);
-         }  
-      }
-      else if(ret == 's')
-      {
-         opts.subpart = (int) strtol(optarg, NULL, 10);
-         if(opts.subpart > 3 || opts.subpart < 0)
-         {
-            fprintf(stderr, "Subpartition %d out of range. Must be 0..3.\n",
-               opts.subpart);
-            print_usage(argv[0], type);
-            exit(EXIT_FAILURE);
-         }
-      }
-      else if(ret == 'h')
-      {
-         print_usage(argv[0], type);
-         exit(EXIT_FAILURE);
-      }
-      else if(ret == 1)
-      {
-         if(str_arg == 0)
-         {
-            opts.image = optarg;
-            str_arg++;
-         }
-         else if(str_arg == 1)
-         {
-            opts.srcpath = optarg;
-            str_arg++;
-         }
-         else if(str_arg == 2 && type == TYPE_MINGET)
-         {
-            opts.dstpath = optarg;
-            str_arg++;
-         }
-         else
-         {
-            fprintf(stderr, "Too many args...\n");
-            print_usage(argv[0], type);
-            exit(EXIT_FAILURE);
-         }
-      }
-      else
-      {
-         print_usage(argv[0], type);
-         exit(EXIT_FAILURE);
-      }
-   }
-   printf("Verbose: %d\n", opts.verbose);
-   printf("Part: %d\n", opts.part);
-   printf("SubPart: %d\n", opts.subpart);
-   printf("Image: %s\n", opts.image);
-   printf("Path: %s\n", opts.srcpath);
-   printf("Dest: %s\n", opts.dstpath);
-}
-
 int main(int argc, char* argv[])
 {
-   parse_options(argc, argv, TYPE_MINGET);
+   peek_fs();
    return 0;
 }
