@@ -142,5 +142,5 @@ typedef struct opts
 void print_usage(char* name, int type);
 void parse_options(int argc, char* argv[], int type, Options* opts);
 void print_mode(uint16_t mode);
-void get_indoe(int num, FILE* disk, struct inode* data);
+void get_inode(int num, struct inode* data);
 uint32_t get_fs(int pt_num);
