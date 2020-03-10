@@ -135,10 +135,98 @@ void farty_partitions()
 void get_inode(int num, FILE* disk, struct inode* data)
 {
    int offset = ADDRESS_OF_INODE(num);
-   printf("offset %d\n", offset);
    fseek(disk, offset, SEEK_SET);
    fread(data, INODE_SIZE, 1, disk);
 }
+
+void print_mode(uint16_t mode)
+{
+   if(mode & MODE_DIR) 
+   {
+      printf("d");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_OR) 
+   {
+      printf("r");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_OW) 
+   {
+      printf("w");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_OX) 
+   {
+      printf("x");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_GR) 
+   {
+      printf("r");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_GW) 
+   {
+      printf("w");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_GX) 
+   {
+      printf("x");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_WR) 
+   {
+      printf("r");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_WW) 
+   {
+      printf("w");
+   }
+   else
+   {
+      printf("-");
+   }
+   if(mode & MODE_WX) 
+   {
+      printf("x");
+   }
+   else
+   {
+      printf("-");
+   }
+}
+
+void ls(struct inode dir)
+{
+   int entries;
+   entries = dir.size / DIRENT_SIZE
 
 void peek_fs()
 {
@@ -146,6 +234,7 @@ void peek_fs()
    uint32_t magic;
    size_t b_read;
    struct inode root;
+   struct inode dir;
    struct dirent file;
    size_t offset;
    size_t zone_offset;
@@ -173,16 +262,17 @@ void peek_fs()
    printf("blocksize:\t\t%d\n", super_block.blocksize);
    printf("subversion:\t\t%d\n", super_block.subversion);
 
-   get_inode(0, disk, &root);
+   get_inode(ROOT_INODE, disk, &root);
 
    printf("Root Inode:\n");
-   printf("Mode:\t\t0x%X\n", root.mode);
-   printf("Links:\t\t%d\n", root.links);
+   printf("Mode:\t");
+   print_mode(root.mode);
+   printf("\nLinks:\t\t%d\n", root.links);
    printf("size:\t\t%d\n", root.size);
 
    printf("Zone[0]:\t%d\n", root.zone[0]);
    
-   zone_offset = super_block.firstdata * (super_block.blocksize << super_block.log_zone_size);
+   zone_offset = ADDRESS_OF_ZONE(root.zone[0]);
    fseek(disk, zone_offset, SEEK_SET);
    fread(&file, sizeof(struct dirent), 1, disk);
    printf("%s's inode: %d\n", file.name, file.inumber);
@@ -196,9 +286,26 @@ void peek_fs()
    printf("%s's inode: %d\n", file.name, file.inumber);
    fread(&file, sizeof(struct dirent), 1, disk);
    printf("%s's inode: %d\n", file.name, file.inumber);
+
+   get_inode(4, disk, &dir);
+   printf("src Inode:\n");
+   printf("Mode:\t");
+   print_mode(dir.mode);
+   printf("\nLinks:\t\t%d\n", dir.links);
+   printf("size:\t\t%d\n", dir.size);
+   printf("Zone[0]:\t%d\n", dir.zone[0]);
+
+   zone_offset = ADDRESS_OF_ZONE(dir.zone[0]);
+   printf("Zone offset: %d\n", zone_offset);
+   fseek(disk, ADDRESS_OF_ZONE(dir.zone[0]), SEEK_SET);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
+   fread(&file, sizeof(struct dirent), 1, disk);
+   printf("%s's inode: %d\n", file.name, file.inumber);
    fread(&file, sizeof(struct dirent), 1, disk);
    printf("%s's inode: %d\n", file.name, file.inumber);
 }
+
 
 int main(int argc, char* argv[])
 {
