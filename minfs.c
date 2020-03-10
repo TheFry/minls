@@ -5,9 +5,7 @@
 #include "minfs.h"
 
 extern uint32_t fs_base;
-/*
-static uint32_t fs_base;
-static FS *disk;
+static FILE *disk;
 static superblock super_block;
 
 
@@ -16,17 +14,16 @@ int main(int argc, char **argv)
    disk = fopen(T_PATH, "r");
    fs_base = 0;
 }
-*/
+
 
 /* Search partitons for the right filesystem */
-/*
+
 int get_fs(int pt_num, int spt_num)
 {
    struct pt_entry pt;
-   struct pt_entry spt;
-   uint16_t valid_pt = -1;*/
+   uint16_t valid_pt = -1;
 
-   /* Get selected primary partition 
+   /* Get selected primary partition */
 
    if(fseek(disk, PT_MAGIC_NUM_OFFSET, SEEK_SET))
    {
@@ -58,7 +55,7 @@ int get_fs(int pt_num, int spt_num)
       exit(EXIT_FAILURE);
    }
 }
-*/
+
 /** Prints usage message. 
  * type is either TYPE_MINLS or TYPE_MINGET
  * name is always argv[0]
