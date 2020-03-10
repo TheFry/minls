@@ -6,7 +6,7 @@
 
 extern uint32_t fs_base;
 static FILE *disk;
-static superblock super_block;
+extern superblock super_block;
 
 
 int main(int argc, char **argv)
@@ -21,26 +21,32 @@ int main(int argc, char **argv)
 int get_fs(int pt_num, int spt_num)
 {
    struct pt_entry pt;
-   uint16_t valid_pt = -1;
+   uint32_t table_offset;
+   uint16_t valid_pt;
 
-   /* Get selected primary partition */
+   table_offset = fs_base + (sizeof(pt_entry) * pt_num);
+   valid_pt = -1;
 
-   if(fseek(disk, PT_MAGIC_NUM_OFFSET, SEEK_SET))
+   /* Check*/
+   if(fseek(disk, PT_MAGIC_NUM_LOCATION, SEEK_SET))
    {
       perror("fseek primary partiton");
    }
 
+   /* Read them */
    if(fread(&valid_pt, sizeof(valid_pt), 1, disk))
    {
       perror("fread primary partition");
    }
 
+   /* Test them */
    if(valid_pt != PT_MAGIC_NUM){
       perror("Not a valid partition table");
       exit(EXIT_FAILURE);
    }
 
-   if(fseek(disk, sizeof(pt_entry) * pt_num, SEEK_SET))                          >
+   
+   if(fseek(disk, table_offset, SEEK_SET))
    {
       perror("fseek primary partiton");
    }

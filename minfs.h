@@ -47,6 +47,7 @@
 #include <stdint.h>
 extern uint32_t fs_base;
 extern FILE *disk;
+extern superblock super_block;
 struct __attribute__ ((__packed__))superblock
 { 
   /* Minix Version 3 Superblock
