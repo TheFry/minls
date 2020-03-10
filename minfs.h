@@ -22,6 +22,16 @@
 0000002 Other write permission
 0000001 Other execute permission
 */
+#define MODE_DIR  0040000
+#define MODE_OR   0000400 
+#define MODE_OW   0000200 
+#define MODE_OX   0000100
+#define MODE_GR   0000040 
+#define MODE_GW   0000020 
+#define MODE_GX   0000010 
+#define MODE_WR   0000004 
+#define MODE_WW   0000002 
+#define MODE_WX   0000001 
 
 #define T_PATH "./test_fs"
 #define SB_OFFSET 1024
@@ -40,7 +50,7 @@
 #define INODE_TABLE_OFFSET (fs_base + (STATIC_BLOCKS + super_block.i_blocks + \
 super_block.z_blocks) * super_block.blocksize)
 #define ROOT_INODE_ADDRESS INODE_TABLE_OFFSET
-#define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + x * INODE_SIZE)
+#define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + (x - 1) * INODE_SIZE)
 #define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
 #define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * x))
 #define DIRENT_SIZE 64
@@ -131,3 +141,4 @@ typedef struct opts
 
 void print_usage(char* name, int type);
 void parse_options(int argc, char* argv[], int type, Options* opts);
+void print_mode(uint16_t mode);
