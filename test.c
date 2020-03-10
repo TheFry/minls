@@ -6,10 +6,10 @@
 
 uint32_t fs_base = 0;
 struct superblock super_block;
+FILE * disk;
 
 void farty_partitions()
 {
-   FILE * disk;
    uint32_t magic;
    uint8_t m1;
    uint8_t m2;
@@ -132,7 +132,7 @@ void farty_partitions()
 
 }
 
-void get_inode(int num, FILE* disk, struct inode* data)
+void get_inode(int num, struct inode* data)
 {
    int offset = ADDRESS_OF_INODE(num);
    fseek(disk, offset, SEEK_SET);
@@ -223,14 +223,42 @@ void print_mode(uint16_t mode)
    }
 }
 
+/** No logic for multiple zones rn. Need to add that shit fam
+ */
 void ls(struct inode dir)
 {
    int entries;
-   entries = dir.size / DIRENT_SIZE
+   int i;
+   struct dirent *directory;
+   struct inode file;
+   entries = dir.size / DIRENT_SIZE;
+   printf("Entries: %d\n", entries);
+   directory = malloc(ZONE_SIZE);
+   if(fseek(disk, ADDRESS_OF_ZONE(dir.zone[0]), SEEK_SET))
+   {
+      perror("Fseek from ls");
+      exit(EXIT_FAILURE);
+   }
+   if( fread(directory, DIRENT_SIZE, entries, disk) != entries)
+   {
+      perror("Fread from ls");
+      exit(EXIT_FAILURE);
+   }
+   for(i = 0; i < entries; i++)
+   {
+      if(directory[i].inumber != 0)
+      {
+         get_inode(directory[i].inumber, &file);
+         print_mode(file.mode);
+         printf("\t%9d %s\n", file.size, directory[i].name);
+      }
+   }
+   free(directory);
+} 
+   
 
 void peek_fs()
 {
-   FILE * disk;
    uint32_t magic;
    size_t b_read;
    struct inode root;
@@ -262,7 +290,7 @@ void peek_fs()
    printf("blocksize:\t\t%d\n", super_block.blocksize);
    printf("subversion:\t\t%d\n", super_block.subversion);
 
-   get_inode(ROOT_INODE, disk, &root);
+   get_inode(ROOT_INODE, &root);
 
    printf("Root Inode:\n");
    printf("Mode:\t");
@@ -272,22 +300,8 @@ void peek_fs()
 
    printf("Zone[0]:\t%d\n", root.zone[0]);
    
-   zone_offset = ADDRESS_OF_ZONE(root.zone[0]);
-   fseek(disk, zone_offset, SEEK_SET);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-
-   get_inode(4, disk, &dir);
+   ls(root);
+   get_inode(4, &dir);
    printf("src Inode:\n");
    printf("Mode:\t");
    print_mode(dir.mode);
@@ -295,15 +309,7 @@ void peek_fs()
    printf("size:\t\t%d\n", dir.size);
    printf("Zone[0]:\t%d\n", dir.zone[0]);
 
-   zone_offset = ADDRESS_OF_ZONE(dir.zone[0]);
-   printf("Zone offset: %d\n", zone_offset);
-   fseek(disk, ADDRESS_OF_ZONE(dir.zone[0]), SEEK_SET);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
-   fread(&file, sizeof(struct dirent), 1, disk);
-   printf("%s's inode: %d\n", file.name, file.inumber);
+   ls(dir);
 }
 
 
