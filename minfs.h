@@ -144,3 +144,4 @@ void parse_options(int argc, char* argv[], int type, Options* opts);
 void print_mode(uint16_t mode);
 void get_inode(int num, struct inode* data);
 uint32_t get_fs(int pt_num);
+void ls(struct inode dir);

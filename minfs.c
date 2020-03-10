@@ -63,10 +63,43 @@ uint32_t get_fs(int pt_num)
    return pt.lFirst;
 }
 
+/** No logic for multiple zones rn. Need to add that shit fam
+ */
+void ls(struct inode dir)
+{
+   int entries;
+   int i;
+   struct dirent *directory;
+   struct inode file;
+   entries = dir.size / DIRENT_SIZE;
+   printf("Entries: %d\n", entries);
+   directory = malloc(ZONE_SIZE);
+   if(fseek(disk, ADDRESS_OF_ZONE(dir.zone[0]), SEEK_SET))
+   {
+      perror("Fseek from ls");
+      exit(EXIT_FAILURE);
+   }
+   if( fread(directory, DIRENT_SIZE, entries, disk) != entries)
+   {
+      perror("Fread from ls");
+      exit(EXIT_FAILURE);
+   }
+   for(i = 0; i < entries; i++)
+   {
+      if(directory[i].inumber != 0)
+      {
+         get_inode(directory[i].inumber, &file);
+         print_mode(file.mode);
+         printf("\t%9d %s\n", file.size, directory[i].name);
+      }
+   }
+   free(directory);
+} 
+
 /** Gets the inode based on a 1-indexed number.
  * Populates 'data' with the inode data
  */
-void get_inode(int num, FILE* disk, struct inode* data)
+void get_inode(int num, struct inode* data)
 {
    int offset = ADDRESS_OF_INODE(num);
    fseek(disk, offset, SEEK_SET);
