@@ -37,10 +37,12 @@
 #define PT_MAGIC_NUM 0xAA55
 #define MINIX_MAGIC_NUM 0x4D5A
 #define INODE_SIZE 64
-#define INODE_TABLE_OFFSET ((STATIC_BLOCKS + super_block.i_blocks + \
+#define INODE_TABLE_OFFSET (fs_base + (STATIC_BLOCKS + super_block.i_blocks + \
 super_block.z_blocks) * super_block.blocksize)
 #define ROOT_INODE_ADDRESS INODE_TABLE_OFFSET
 #define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + x * INODE_SIZE)
+#define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
+#define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * x))
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
 #define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
