@@ -6,6 +6,7 @@
 
 uint32_t fs_base = 512;
 FILE *disk;
+struct superblock super_block;
 int main(int argc, char* argv[])
 {
    Options opts = {FALSE, -1, -1, "", "", ""};
