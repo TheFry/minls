@@ -5,35 +5,28 @@
 #include "minfs.h"
 
 extern uint32_t fs_base;
-static FILE *disk;
-extern superblock super_block;
+extern FILE *disk;
+extern struct superblock super_block;
 
-
-int main(int argc, char **argv)
-{
-   disk = fopen(T_PATH, "r");
-   fs_base = 0;
-}
-
-
-/* Search partitons for the right filesystem */
-
+/** MAKE SURE fs_base HAS BEEN SET! 
+  * This function treat fs_base as the begining of a partition
+  * AKA a partition table 
+*/
 int get_fs(int pt_num, int spt_num)
 {
    struct pt_entry pt;
    uint32_t table_offset;
    uint16_t valid_pt;
 
-   table_offset = fs_base + (sizeof(pt_entry) * pt_num);
+   table_offset = PT_BASE + (sizeof(struct pt_entry) * pt_num);
    valid_pt = -1;
 
-   /* Check*/
+   /** Check the validity of the PT*/
    if(fseek(disk, PT_MAGIC_NUM_LOCATION, SEEK_SET))
    {
       perror("fseek primary partiton");
    }
 
-   /* Read them */
    if(fread(&valid_pt, sizeof(valid_pt), 1, disk))
    {
       perror("fread primary partition");
@@ -46,20 +39,24 @@ int get_fs(int pt_num, int spt_num)
    }
 
    
+   /** Now get the PT entry, check the fs type */
    if(fseek(disk, table_offset, SEEK_SET))
    {
       perror("fseek primary partiton");
    }
    
-   if(fread(&pt_entry, sizeof(pt_entry), 1, disk))
+   if(fread(&pt, sizeof(struct pt_entry), 1, disk))
    {
       perror("fread primary partition");
    }
 
-   if(pt_entry.type != MINIX_PART_TYPE){
+   if(pt.type != MINIX_PART_TYPE){
       fprintf(stderr, "Not a valid minix partition\n");
       exit(EXIT_FAILURE);
    }
+   /* Return fs start location */
+   printf("Valid Minix partition\n");
+   return pt.lFirst;
 }
 
 /** Prints usage message. 
