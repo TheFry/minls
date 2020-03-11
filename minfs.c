@@ -165,6 +165,9 @@ void read_zone(int num, void *buffer)
 }
 
 
+/** Reads all zone numbers in an I-node and combines them into
+  * a buffer. The buffer is in the proper order to read a file
+  * sequentially.*/
 uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
 {
    int b = 0;
@@ -186,6 +189,8 @@ uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
    i = 0;
    if(b >= size)
    {
+      free(zone);
+      free(double_zone);
       return b;
    }
 
@@ -199,6 +204,8 @@ uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
 
    if(b >= size)
    {
+      free(zone);
+      free(double_zone);
       return b;
    }
 
@@ -219,14 +226,17 @@ uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
 
    if(b >= size)
    {
+      free(zone);
+      free(double_zone);
       return b;
    }
 
+   free(zone);
+   free(double_zone);
    fprintf(stderr, "Too many zones requested\nRequested: %d\nMax: %d\n",
                     size, DIRECT_ZONES + NUM_ZONES_INDR +
                     (NUM_ZONES_INDR * NUM_ZONES_INDR));
    exit(EXIT_FAILURE);
-
 }
 
 
