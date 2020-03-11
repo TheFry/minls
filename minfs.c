@@ -128,8 +128,16 @@ void ls(struct inode dir)
 void get_inode(int num, struct inode* data)
 {
    int offset = ADDRESS_OF_INODE(num);
-   fseek(disk, offset, SEEK_SET);
-   fread(data, INODE_SIZE, 1, disk);
+   if(fseek(disk, offset, SEEK_SET))
+   {
+      perror("Fseek get inode");
+      exit(EXIT_FAILURE);
+   }
+   if(fread(data, INODE_SIZE, 1, disk) != 1)
+   {
+      perror("Fread get inode");
+      exit(EXIT_FAILURE);
+   }
 }
 
 /** Prints the file mode
