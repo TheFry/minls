@@ -52,6 +52,8 @@ super_block.z_blocks) * super_block.blocksize)
 #define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + (x - 1) * INODE_SIZE)
 #define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
 #define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * x))
+#define NUM_ZONES_INDR (super_block.blocksize / 32)
+#define NUM_ZONES_DINDR (NUM_ZONES_INDR * NUM_ZONES_INDR)
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
 #define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
