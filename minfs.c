@@ -138,15 +138,22 @@ void read_inode(int num, struct inode *data)
 void read_zone(int num, void *buffer)
 {
    int offset = ADDRESS_OF_ZONE(num);
-   if(fseek(disk, offset, SEEK_SET))
+   if(num == 0)
    {
-      perror("Fseek read zone");
-      exit(EXIT_FAILURE);
+      memset(buffer, 0, ZONE_SIZE);
    }
-   if(fread(buffer, ZONE_SIZE, 1, disk) != 1)
+   else
    {
-      perror("Fread read zone");
-      exit(EXIT_FAILURE);
+      if(fseek(disk, offset, SEEK_SET))
+      {
+         perror("Fseek read zone");
+         exit(EXIT_FAILURE);
+      }
+      if(fread(buffer, ZONE_SIZE, 1, disk) != 1)
+      {
+         perror("Fread read zone");
+         exit(EXIT_FAILURE);
+      }
    }
 }
 
