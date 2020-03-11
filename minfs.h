@@ -53,7 +53,10 @@ super_block.z_blocks) * super_block.blocksize)
 #define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
 #define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * x))
 #define NUM_ZONES_INDR (super_block.blocksize / 32)
-#define NUM_ZONES_DINDR (NUM_ZONES_INDR * NUM_ZONES_INDR)
+
+#define ZONES_IN_FILE(size) (size % ZONE_SIZE > 0 ? \
+(size / ZONE_SIZE) + 1 : size / ZONE_SIZE)
+
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
 #define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
@@ -149,3 +152,4 @@ uint32_t get_part(int pt_num);
 void find_fs(Options opts);
 void ls(struct inode dir);
 void load_superblock();
+uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size);

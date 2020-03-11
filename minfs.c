@@ -100,23 +100,39 @@ uint32_t get_part(int pt_num)
  */
 void ls(struct inode dir)
 {
-   int entries;
-   int i;
+   int zones, entries;
+   uint32_t *zone_nums;
+   int i, d;
+   int listed = 0;
    struct dirent *directory;
    struct inode file;
-   entries = dir.size / DIRENT_SIZE;
+   zones = ZONES_IN_FILE(dir.size);
    directory = malloc(ZONE_SIZE);
-   read_zone(dir.zone[0], directory);
-   for(i = 0; i < entries; i++)
+   zone_nums = malloc(sizeof(uint32_t) * zones);
+
+   entries = dir.size / DIRENT_SIZE;
+   get_zone_list(dir, zone_nums, zones);
+
+   for(i = 0; i < zones; i++)
    {
-      if(directory[i].inumber != 0)
+      read_zone(zone_nums[i], directory);
+      for(d = 0; d < (ZONE_SIZE / DIRENT_SIZE); d++)
       {
-         read_inode(directory[i].inumber, &file);
-         print_mode(file.mode);
-         printf("\t%9d %s\n", file.size, directory[i].name);
+         if(listed >= entries)
+         {
+            break;
+         }
+         if(directory[d].inumber != 0)
+         {
+            read_inode(directory[d].inumber, &file);
+            print_mode(file.mode);
+            printf("\t%9d %s\n", file.size, directory[d].name);
+         }
+         listed++;
       }
    }
    free(directory);
+   free(zone_nums);
 } 
 
 
@@ -168,7 +184,7 @@ void read_zone(int num, void *buffer)
 /** Reads all zone numbers in an I-node and combines them into
   * a buffer. The buffer is in the proper order to read a file
   * sequentially.*/
-uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
+uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
 {
    int b = 0;
    int c = 0;
@@ -181,7 +197,7 @@ uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
 
    while(b < size && i < DIRECT_ZONES)
    {
-      buff[b] = node->zone[i];
+      buff[b] = node.zone[i];
       ++i;
       ++b;
    }
@@ -194,7 +210,7 @@ uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
       return b;
    }
 
-   read_zone(node->indirect, zone);
+   read_zone(node.indirect, zone);
    while(b < size && i < NUM_ZONES_INDR)
    {
       buff[b] = zone[i];
@@ -210,7 +226,7 @@ uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
    }
 
    i = 0;
-   read_zone(node->two_indirect, double_zone);
+   read_zone(node.two_indirect, double_zone);
    while(b < size && c < NUM_ZONES_INDR)
    {
       read_zone(double_zone[c], zone);

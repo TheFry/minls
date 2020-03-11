@@ -11,4 +11,5 @@ struct superblock super_block;
 int main(int argc, char* argv[])
 {
    printf("minget my ass\n");
+   return 0;
 }
