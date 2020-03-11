@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
    }
    find_fs(opts);
    load_superblock();
-   get_inode(ROOT_INODE, &dir);
+   read_inode(ROOT_INODE, &dir);
    ls(dir);
    return 0;
 }

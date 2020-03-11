@@ -133,15 +133,16 @@ typedef struct opts
    short verbose;
    int part;
    int subpart;
-   char* srcpath; /* This is where path gets put for minls */
-   char* dstpath;
-   char* image;
+   char *srcpath; /* This is where path gets put for minls */
+   char *dstpath;
+   char *image;
 } Options;
 
-void print_usage(char* name, int type);
-void parse_options(int argc, char* argv[], int type, Options* opts);
+void print_usage(char *name, int type);
+void parse_options(int argc, char* argv[], int type, Options *opts);
 void print_mode(uint16_t mode);
-void get_inode(int num, struct inode* data);
+void read_inode(int num, struct inode *data);
+void read_zone(int num, void *buffer);
 uint32_t get_part(int pt_num);
 void find_fs(Options opts);
 void ls(struct inode dir);

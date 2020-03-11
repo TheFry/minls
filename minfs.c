@@ -100,21 +100,12 @@ void ls(struct inode dir)
    struct inode file;
    entries = dir.size / DIRENT_SIZE;
    directory = malloc(ZONE_SIZE);
-   if(fseek(disk, ADDRESS_OF_ZONE(dir.zone[0]), SEEK_SET))
-   {
-      perror("Fseek from ls");
-      exit(EXIT_FAILURE);
-   }
-   if( fread(directory, DIRENT_SIZE, entries, disk) != entries)
-   {
-      perror("Fread from ls");
-      exit(EXIT_FAILURE);
-   }
+   read_zone(dir.zone[0], directory);
    for(i = 0; i < entries; i++)
    {
       if(directory[i].inumber != 0)
       {
-         get_inode(directory[i].inumber, &file);
+         read_inode(directory[i].inumber, &file);
          print_mode(file.mode);
          printf("\t%9d %s\n", file.size, directory[i].name);
       }
@@ -125,20 +116,40 @@ void ls(struct inode dir)
 /** Gets the inode based on a 1-indexed number.
  * Populates 'data' with the inode data
  */
-void get_inode(int num, struct inode* data)
+void read_inode(int num, struct inode *data)
 {
    int offset = ADDRESS_OF_INODE(num);
    if(fseek(disk, offset, SEEK_SET))
    {
-      perror("Fseek get inode");
+      perror("Fseek read inode");
       exit(EXIT_FAILURE);
    }
    if(fread(data, INODE_SIZE, 1, disk) != 1)
    {
-      perror("Fread get inode");
+      perror("Fread read inode");
       exit(EXIT_FAILURE);
    }
 }
+
+
+/** Gets the zone based on a 0-indexed number.
+ * Populates 'buffer' with the zone data
+ */
+void read_zone(int num, void *buffer)
+{
+   int offset = ADDRESS_OF_ZONE(num);
+   if(fseek(disk, offset, SEEK_SET))
+   {
+      perror("Fseek read zone");
+      exit(EXIT_FAILURE);
+   }
+   if(fread(buffer, ZONE_SIZE, 1, disk) != 1)
+   {
+      perror("Fread read zone");
+      exit(EXIT_FAILURE);
+   }
+}
+
 
 /** Prints the file mode
  * ( it's disgusting I'm sorry :-[ ) -David
