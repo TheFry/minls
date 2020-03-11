@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <getopt.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -312,9 +313,83 @@ void peek_fs()
    ls(dir);
 }
 
+void midnight_toker()
+{
+   char* path1;
+   char* path2;
+   char* path3;
+   char* tok;
+
+   path1 = malloc(sizeof(char)* 12);
+   strcpy(path1, "foo/bar/bas");
+   path2 = malloc(sizeof(char)* 12);
+   strcpy(path2, "/foo/bar/bas");
+   path3 = malloc(sizeof(char)* 13);
+   strcpy(path3, "/foo/bar/bas/");
+
+   tok = strtok(path1, "/");
+   printf("\n-----PATH 1------\n");
+   while(tok != NULL)
+   {
+      printf("Finding file: '%s'\n", tok);
+      tok = strtok(NULL, "/");
+   }
+   printf("\n-----PATH 2------\n");
+   tok = strtok(path2, "/");
+   while(tok != NULL)
+   {
+      printf("Finding file: '%s'\n", tok);
+      tok = strtok(NULL, "/");
+   }
+   printf("\n-----PATH 3------\n");
+   tok = strtok(path3, "/");
+   while(tok != NULL)
+   {
+      printf("Finding file: '%s'\n", tok);
+      tok = strtok(NULL, "/");
+   }
+}
+
+void set_buffer(int* src, int *dest)
+{
+   int i;
+   for(i = 0; i < 5; i++)
+   {
+      dest[i] = src[i];
+   }
+}
 
 int main(int argc, char* argv[])
 {
-   peek_fs();
+   int src[5];
+   int *dest;
+   int i;
+   dest = malloc(sizeof(int) * 5);
+   for(i = 0; i < 5; i++)
+   {
+      src[i] = i;
+      dest[i] = 0;
+   }
+   printf("BEFORE\n");
+   for(i = 0; i < 5; i++)
+   {
+      printf("Src[%d]: %d\tDst[%d]: %d\n",i,src[i],i,dest[i]);
+   }
+   set_buffer(src,dest);
+   printf("\nAFTER FUNCTION CALL\n");
+   for(i = 0; i < 5; i++)
+   {
+      printf("Src[%d]: %d\tDst[%d]: %d\n",i,src[i],i,dest[i]);
+   }
+   for(i = 0; i < 5; i++)
+   {
+      src[i] = 0;
+   }
+   printf("\nAFTER SETTING SRC TO 0\n");
+   for(i = 0; i < 5; i++)
+   {
+      printf("Src[%d]: %d\tDst[%d]: %d\n",i,src[i],i,dest[i]);
+   }
+   
    return 0;
 }
