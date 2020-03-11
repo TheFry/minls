@@ -12,7 +12,7 @@ minget: minfs.o minget.o
 minls.o: minls.c minfs.h
 	$(CC) $(CFLAGS) -c minls.c
 
-minget.o: minget.o minfs.h
+minget.o: minget.c minfs.h
 	$(CC) $(CFLAGS) -c minget.c
 
 minfs.o: minfs.c minfs.h

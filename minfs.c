@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "minfs.h"
-
+#include <string.h>
 extern uint32_t fs_base;
 extern FILE *disk;
 extern struct superblock super_block;
