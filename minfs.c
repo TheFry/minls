@@ -8,6 +8,9 @@ extern uint32_t fs_base;
 extern FILE *disk;
 extern struct superblock super_block;
 
+
+
+
 void load_superblock()
 {
    fseek(disk, SB_BASE, SEEK_SET);
@@ -19,6 +22,7 @@ void load_superblock()
       exit(EXIT_FAILURE);
    }
 }
+
 
 void find_fs(Options opts)
 {
@@ -34,6 +38,7 @@ void find_fs(Options opts)
       fs_base = (SECTOR_SIZE * lFirst);
    }
 }
+
 
 /** MAKE SURE fs_base HAS BEEN SET! 
   * This function treat fs_base as the begining of a partition
@@ -90,6 +95,7 @@ uint32_t get_part(int pt_num)
    return pt.lFirst;
 }
 
+
 /** No logic for multiple zones rn. Need to add that shit fam
  */
 void ls(struct inode dir)
@@ -112,6 +118,7 @@ void ls(struct inode dir)
    }
    free(directory);
 } 
+
 
 /** Gets the inode based on a 1-indexed number.
  * Populates 'data' with the inode data
@@ -155,6 +162,71 @@ void read_zone(int num, void *buffer)
          exit(EXIT_FAILURE);
       }
    }
+}
+
+
+uint32_t get_zone_list(struct inode *node, uint32_t *buff, uint32_t size)
+{
+   int b = 0;
+   int c = 0;
+   int i = 0;
+   uint32_t *zone = NULL;
+   uint32_t *double_zone = NULL;
+
+   zone = malloc(ZONE_SIZE);
+   double_zone = malloc(ZONE_SIZE);
+
+   while(b < size && i < DIRECT_ZONES)
+   {
+      buff[b] = node->zone[i];
+      ++i;
+      ++b;
+   }
+
+   i = 0;
+   if(b >= size)
+   {
+      return b;
+   }
+
+   read_zone(node->indirect, zone);
+   while(b < size && i < NUM_ZONES_INDR)
+   {
+      buff[b] = zone[i];
+      ++b;
+      ++i;
+   }
+
+   if(b >= size)
+   {
+      return b;
+   }
+
+   i = 0;
+   read_zone(node->two_indirect, double_zone);
+   while(b < size && c < NUM_ZONES_INDR)
+   {
+      read_zone(double_zone[c], zone);
+      while(b < size && i < NUM_ZONES_INDR)
+      {
+         buff[b] = zone[i];
+         ++b;
+         ++i;
+      }
+      i = 0;
+      ++c;
+   }
+
+   if(b >= size)
+   {
+      return b;
+   }
+
+   fprintf(stderr, "Too many zones requested\nRequested: %d\nMax: %d\n",
+                    size, DIRECT_ZONES + NUM_ZONES_INDR +
+                    (NUM_ZONES_INDR * NUM_ZONES_INDR));
+   exit(EXIT_FAILURE);
+
 }
 
 
@@ -246,6 +318,8 @@ void print_mode(uint16_t mode)
       printf("-");
    }
 }
+
+
 /** Prints usage message. 
  * type is either TYPE_MINLS or TYPE_MINGET
  * name is always argv[0]
