@@ -174,7 +174,7 @@ void print_sb()
    fprintf(stderr, "  z_blocks   %9d\n", super_block.z_blocks);
    fprintf(stderr, "  firstdata   %8d\n", super_block.firstdata);
    fprintf(stderr, "  log_zone_size  %5d (zone size: %d)\n", 
-      super_block.i_blocks, ZONE_SIZE);
+      super_block.log_zone_size, ZONE_SIZE);
    fprintf(stderr, "  max_file  %10u\n", super_block.max_file);
    fprintf(stderr, "  magic         0x%04X\n", super_block.magic);
    fprintf(stderr, "  zones      %9d\n", super_block.zones);
