@@ -23,6 +23,7 @@
 0000001 Other execute permission
 */
 #define MODE_DIR  0040000
+#define MODE_REG  0100000
 #define MODE_OR   0000400 
 #define MODE_OW   0000200 
 #define MODE_OX   0000100
