@@ -83,13 +83,13 @@ void copy_data(struct inode *file, char *outdir)
    /* Go through zone by zone and copy */
    for(i = 0; i < zone_count; i++)
    {
-      if(zone_nums[i] != 0){
-         read_zone(zone_nums[i], buff);
-         if(fwrite(buff, ZONE_SIZE, 1, outfile) <= 0){
-            perror(outdir);
-         }
-         memset(buff, '\0', ZONE_SIZE);
+      read_zone(zone_nums[i], buff);
+      write_bytes = size >= ZONE_SIZE ? ZONE_SIZE : size;
+      if(fwrite(buff, write_bytes, 1, outfile) <= 0){
+         perror(outdir);
       }
+      memset(buff, 0, ZONE_SIZE);
+      size -= ZONE_SIZE;
    }
    free(buff);
    free(zone_nums);
