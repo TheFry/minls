@@ -284,19 +284,11 @@ uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
 
    i = 0;
    read_zone(node.two_indirect, double_zone);
-   printf("TWOINDR: %u\n", node.two_indirect);
    while(b < size && c < NUM_ZONES_INDR)
    {
       read_zone(double_zone[c], zone);
-      printf("IND ZONE NUM[%d]: %d\n", c,double_zone[c]);
-      printf("Address: %u\n", ADDRESS_OF_ZONE(double_zone[c]));
       while(b < size && i < NUM_ZONES_INDR)
       {
-         if(zone[i] != 0)
-         {
-            printf("\tDIRECT ZONE NUM[%d]: %d\n", b, zone[i]);
-            printf("\tAddress: %u\n", ADDRESS_OF_ZONE(zone[i]));
-         }
          buff[b] = zone[i];
          ++b;
          ++i;
@@ -314,7 +306,7 @@ uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
 
    free(zone);
    free(double_zone);
-   fprintf(stderr, "Too many zones requested\nRequested: %d\nMax: %d\n",
+   fprintf(stderr, "Too many zones requested\nRequested: %d\nMax: %lu\n",
                     size, DIRECT_ZONES + NUM_ZONES_INDR +
                     (NUM_ZONES_INDR * NUM_ZONES_INDR));
    exit(EXIT_FAILURE);

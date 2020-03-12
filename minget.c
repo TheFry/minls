@@ -42,7 +42,6 @@ void copy_data(struct inode *file, char *outdir)
    int zone_count = 0;
    int i = 0;
    size_t size, write_bytes;
-   char *debug_str;
    size = file->size;
 
    /* No file provided */
@@ -61,7 +60,6 @@ void copy_data(struct inode *file, char *outdir)
    }
 
    zone_count = ZONES_IN_FILE(file->size);
-   debug_str = malloc(sizeof(char) * 20);
    zone_nums = malloc(sizeof(uint32_t) * zone_count);
    buff = malloc(ZONE_SIZE);
    
@@ -75,16 +73,21 @@ void copy_data(struct inode *file, char *outdir)
 
 
    /* Check that the file given is a regular file */
-   if(!(file->mode & MODE_REG))// || (file->mode & MODE_LN))
+   if(!(file->mode & MODE_REG))
    {
       free(zone_nums);
       free(buff);
-      free(debug_str);
       fprintf(stderr, "Not a regular file\n");
       exit(EXIT_FAILURE);
    }
-
-
+   /*
+   if((file->mode & MODE_LN))
+   {
+      free(zone_nums);
+      free(buff);
+      fprintf(stderr, "Not a regular file\n");
+      exit(EXIT_FAILURE);
+   }*/
    /* Get a list of the zone numbers in order */
    get_zone_list(*file, zone_nums, zone_count);
 
@@ -93,28 +96,16 @@ void copy_data(struct inode *file, char *outdir)
    {
       read_zone(zone_nums[i], buff);
       write_bytes = size >= ZONE_SIZE ? ZONE_SIZE : size;
-      if(i == DIRECT_ZONES)
-      {
-         fwrite("End of Direct. INDIRECT BELOW", sizeof(char) * 29, 1, outfile);
-      }
-      if(i == (NUM_ZONES_INDR + DIRECT_ZONES))
-      {
-         fwrite("End of Indirect. DOUBLE BELOW", sizeof(char) * 29, 1, outfile);
-      }
       if(fwrite(buff, 1, write_bytes, outfile) <= 0){
          free(buff);
          free(zone_nums);
-         free(debug_str);
          fclose(outfile);
          perror(outdir);
       }
-      sprintf(debug_str, "ZONE(%d)", i);
-      fwrite(debug_str, strlen(debug_str), 1, outfile);
       memset(buff, 0, ZONE_SIZE);
       size -= ZONE_SIZE;
    }
    free(buff);
    free(zone_nums);
-   free(debug_str);
    fclose(outfile);
 }

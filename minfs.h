@@ -73,7 +73,7 @@ super_block.z_blocks) * super_block.blocksize)
 /* Zone related macros */
 #define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
 #define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * (x)))
-#define NUM_ZONES_INDR (super_block.blocksize / 32)
+#define NUM_ZONES_INDR (super_block.blocksize / sizeof(uint32_t))
 #define ZONES_IN_FILE(size) (size % ZONE_SIZE > 0 ? \
 (size / ZONE_SIZE) + 1 : size / ZONE_SIZE)
 
