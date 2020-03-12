@@ -8,6 +8,10 @@ extern uint32_t fs_base;
 extern FILE *disk;
 extern struct superblock super_block;
 
+/** Reads the superblock into the global 'super_block' structure
+ * checks if it is a valid MINIX filesystem, and if verbosity is required
+ * print the contents
+ */
 void load_superblock(Options opts)
 {
    fseek(disk, SB_BASE, SEEK_SET);
@@ -24,7 +28,13 @@ void load_superblock(Options opts)
    }
 }
 
-
+/** Finds the base of the file system. This involves accessing the partition
+ * table and going to those partitions if the user specified that the image
+ * is partitioned. This also updates 'fs_base' to the correct 'base' of the 
+ * file system
+ *
+ * Prints the partition tables if verbosity is requested
+ */
 void find_fs(Options opts)
 {
    uint32_t lFirst;
@@ -106,7 +116,7 @@ uint32_t get_part(int pt_num)
 }
 
 /** traverse_path:
- * Traverses the path given and returns the inode of the
+ * Traverses the path given and sets 'file' to the inode of the
  * file at the end of the path
  * Makes a local copy of the path so it doesn't mess up the path that gets
  * passed in
@@ -117,6 +127,7 @@ int traverse_path(char *path, struct inode *file)
    char *fname;   
    char *tmp_path;
    read_inode(ROOT_INODE, file);
+   /* If the user didn't specify a path, then the root inode is set */
    if(path == NULL)
    {
       return 1;
@@ -140,6 +151,10 @@ int traverse_path(char *path, struct inode *file)
    return 1;
 }
 
+/** This takes the inode of a directory and a filename and searches for 
+ * that file within the directory. If it finds it it will set 'file' to 
+ * the inode of that file.
+ */
 int find_file(char *fname, struct inode dir, struct inode *file)
 {
    int zones, entries;
@@ -267,6 +282,7 @@ uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
       return b;
    }
 
+   /* Read all zone numbers from indirect zone */
    read_zone(node.indirect, zone);
    while(b < size && i < NUM_ZONES_INDR)
    {
@@ -283,6 +299,7 @@ uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
    }
 
    i = 0;
+   /* Read all zone numbers from double indirect zone */
    read_zone(node.two_indirect, double_zone);
    while(b < size && c < NUM_ZONES_INDR)
    {
