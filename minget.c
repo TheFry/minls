@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
       print_inode(file);
    }
    copy_data(&file, opts.dstpath);
+   fclose(disk);
    return 0;
 }
 
@@ -44,7 +45,6 @@ void copy_data(struct inode *file, char *outdir)
    char *debug_str;
    size = file->size;
 
-   debug_str = malloc(sizeof(char) * 20);
    /* No file provided */
    if(outdir == NULL)
    {
@@ -61,6 +61,7 @@ void copy_data(struct inode *file, char *outdir)
    }
 
    zone_count = ZONES_IN_FILE(file->size);
+   debug_str = malloc(sizeof(char) * 20);
    zone_nums = malloc(sizeof(uint32_t) * zone_count);
    buff = malloc(ZONE_SIZE);
    
@@ -74,8 +75,11 @@ void copy_data(struct inode *file, char *outdir)
 
 
    /* Check that the file given is a regular file */
-   if(!(file->mode & MODE_REG) || (file->mode & MODE_LN))
+   if(!(file->mode & MODE_REG))// || (file->mode & MODE_LN))
    {
+      free(zone_nums);
+      free(buff);
+      free(debug_str);
       fprintf(stderr, "Not a regular file\n");
       exit(EXIT_FAILURE);
    }
@@ -98,6 +102,10 @@ void copy_data(struct inode *file, char *outdir)
          fwrite("End of Indirect. DOUBLE BELOW", sizeof(char) * 29, 1, outfile);
       }
       if(fwrite(buff, 1, write_bytes, outfile) <= 0){
+         free(buff);
+         free(zone_nums);
+         free(debug_str);
+         fclose(outfile);
          perror(outdir);
       }
       sprintf(debug_str, "ZONE(%d)", i);
@@ -107,5 +115,6 @@ void copy_data(struct inode *file, char *outdir)
    }
    free(buff);
    free(zone_nums);
+   free(debug_str);
    fclose(outfile);
 }

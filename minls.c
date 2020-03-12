@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
       printf("%s:\n", opts.srcpath == NULL ? "/" : opts.srcpath);
    }
    ls(dir, opts.srcpath);
+   fclose(disk);
    return 0;
 }
 

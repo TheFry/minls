@@ -175,6 +175,8 @@ int find_file(char *fname, struct inode dir, struct inode *file)
             if(strncmp(fname, directory[d].name, 60) == 0)
             {
                read_inode(directory[d].inumber, file);
+               free(directory);
+               free(zone_nums);
                return 1;
             }
          }
@@ -212,7 +214,7 @@ void read_inode(int num, struct inode *data)
  */
 void read_zone(int num, void *buffer)
 {
-   int offset = ADDRESS_OF_ZONE(num);
+   uint32_t offset = ADDRESS_OF_ZONE(num);
    size_t ret;
 
    if(num == 0)
@@ -282,14 +284,19 @@ uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
 
    i = 0;
    read_zone(node.two_indirect, double_zone);
+   printf("TWOINDR: %u\n", node.two_indirect);
    while(b < size && c < NUM_ZONES_INDR)
    {
       read_zone(double_zone[c], zone);
       printf("IND ZONE NUM[%d]: %d\n", c,double_zone[c]);
-      printf("Next: %d\n", double_zone[1]);
+      printf("Address: %u\n", ADDRESS_OF_ZONE(double_zone[c]));
       while(b < size && i < NUM_ZONES_INDR)
       {
-         //printf("\tDIRECT ZONE NUM[%d]: %d\n", b, zone[i]);
+         if(zone[i] != 0)
+         {
+            printf("\tDIRECT ZONE NUM[%d]: %d\n", b, zone[i]);
+            printf("\tAddress: %u\n", ADDRESS_OF_ZONE(zone[i]));
+         }
          buff[b] = zone[i];
          ++b;
          ++i;
