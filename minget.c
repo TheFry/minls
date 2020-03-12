@@ -37,7 +37,7 @@ void copy_data(struct inode *file, char *outdir)
 {
    FILE *outfile = NULL;
    uint32_t *zone_nums = NULL;
-   uint8_t *buff = NULL;
+   void *buff = NULL;
    int zone_count = 0;
    int i = 0;
 
@@ -58,7 +58,7 @@ void copy_data(struct inode *file, char *outdir)
 
    zone_count = ZONES_IN_FILE(file->size);
    zone_nums = malloc(sizeof(uint32_t) * zone_count);
-   buff = malloc(sizeof(uint8_t) * ZONE_SIZE);
+   buff = malloc(ZONE_SIZE);
    
    /* Check all the buffers for validity */
    if(zone_nums == NULL || buff == NULL)
@@ -83,11 +83,13 @@ void copy_data(struct inode *file, char *outdir)
    /* Go through zone by zone and copy */
    for(i = 0; i < zone_count; i++)
    {
-      read_zone(zone_nums[i], buff);
-      if(fwrite(buff, sizeof(uint8_t) * ZONE_SIZE, 1, outfile) <= 0){
-         perror(outdir);
+      if(zone_nums[i] != 0){
+         read_zone(zone_nums[i], buff);
+         if(fwrite(buff, ZONE_SIZE, 1, outfile) <= 0){
+            perror(outdir);
+         }
+         memset(buff, '\0', ZONE_SIZE);
       }
-      memset(buff, '\0', sizeof(uint8_t) * ZONE_SIZE);
    }
    free(buff);
    free(zone_nums);
