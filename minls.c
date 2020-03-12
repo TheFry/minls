@@ -18,9 +18,16 @@ int main(int argc, char* argv[])
       exit(-1);
    }
    find_fs(opts);
-   load_superblock();
+   load_superblock(opts);
    traverse_path(opts.srcpath, &dir);
-   printf("%s:\n", opts.srcpath == NULL ? "/" : opts.srcpath);
+   if(opts.verbose)
+   {
+      print_inode(dir);
+   }
+   if(dir.mode & MODE_DIR)
+   {
+      printf("%s:\n", opts.srcpath == NULL ? "/" : opts.srcpath);
+   }
    ls(dir, opts.srcpath);
    return 0;
 }

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <sys/types.h>
+#include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -161,5 +163,52 @@ void print_pt()
          pt[i].type, pt[i].end_head, end_sec, end_cyl, 
          pt[i].lFirst, pt[i].size);
    }
-       
+}
+
+void print_sb()
+{
+   fprintf(stderr, "\nSuperblock Contents:\n");
+   fprintf(stderr, "Stored Fields:\n");
+   fprintf(stderr, "  ninodes    %9d\n", super_block.ninodes);
+   fprintf(stderr, "  i_blocks   %9d\n", super_block.i_blocks);
+   fprintf(stderr, "  z_blocks   %9d\n", super_block.z_blocks);
+   fprintf(stderr, "  firstdata   %8d\n", super_block.firstdata);
+   fprintf(stderr, "  log_zone_size  %5d (zone size: %d)\n", 
+      super_block.i_blocks, ZONE_SIZE);
+   fprintf(stderr, "  max_file  %10u\n", super_block.max_file);
+   fprintf(stderr, "  magic         0x%04X\n", super_block.magic);
+   fprintf(stderr, "  zones      %9d\n", super_block.zones);
+   fprintf(stderr, "  blocksize  %9d\n", super_block.blocksize);
+   fprintf(stderr, "  subversion  %8d\n", super_block.subversion);
+}
+
+void print_inode(struct inode node)
+{
+   int i;
+   time_t atime, cctime, mtime;
+   atime = node.atime;
+   cctime = node.ctime;
+   mtime = node.mtime;
+   fprintf(stderr, "\nFile inode:\n");   
+   fprintf(stderr, "  uint16_t mode          0x%04X\n", node.mode);
+   /*
+   print_mode(node.mode);
+   fprintf(stderr, ")\n"); */
+   fprintf(stderr, "  uint16_t  links     %9d\n", node.links);
+   fprintf(stderr, "  uint16_t  uid       %9d\n", node.uid);
+   fprintf(stderr, "  uint16_t  gid       %9d\n", node.gid);
+   fprintf(stderr, "  uint32_t  size     %10u\n", node.size);
+   fprintf(stderr, "  int32_t   atime    %10u --- %s", 
+      node.atime, ctime(&atime));
+   fprintf(stderr, "  int32_t   mtime    %10u --- %s", 
+      node.mtime, ctime(&mtime));
+   fprintf(stderr, "  int32_t   ctime    %10u --- %s\n", 
+      node.ctime, ctime(&cctime));
+   fprintf(stderr, "Direct zones:\n");
+   for(i = 0; i < DIRECT_ZONES; i++)
+   {
+      fprintf(stderr, "            zone[%d]   = %10u\n", i, node.zone[i]);
+   }
+   fprintf(stderr, " uint32_t  indirect   = %10u\n", node.indirect);  
+   fprintf(stderr, " uint32_t  double     = %10u\n\n", node.two_indirect);  
 }
