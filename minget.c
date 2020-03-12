@@ -40,6 +40,8 @@ void copy_data(struct inode *file, char *outdir)
    void *buff = NULL;
    int zone_count = 0;
    int i = 0;
+   size_t size, write_bytes;
+   size = file->size;
 
    /* No file provided */
    if(outdir == NULL)
