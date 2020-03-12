@@ -154,5 +154,5 @@ void find_fs(Options opts);
 int ls(struct inode dir, char *path);
 void load_superblock();
 uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size);
-void traverse_path(char *path, struct inode *file);
+int traverse_path(char *path, struct inode *file);
 int find_file(char *fname, struct inode dir, struct inode *file);

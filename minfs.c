@@ -100,12 +100,16 @@ uint32_t get_part(int pt_num)
  * Makes a local copy of the path so it doesn't mess up the path that gets
  * passed in
  */
-void traverse_path(char *path, struct inode *file)
+int traverse_path(char *path, struct inode *file)
 {
    struct inode dir;
    char *fname;   
    char *tmp_path;
    read_inode(ROOT_INODE, file);
+   if(path == NULL)
+   {
+      return 1;
+   }
    dir = *file;
    tmp_path = malloc(sizeof(char) * strlen(path));
    strcpy(tmp_path, path);
@@ -115,11 +119,14 @@ void traverse_path(char *path, struct inode *file)
       if(find_file(fname, dir, file) == -1)
       {
          fprintf(stderr, "%s: File not found\n", path);
+         free(tmp_path);
          exit(EXIT_FAILURE);
       }
       dir = *file;
       fname = strtok(NULL, "/");
    }
+   free(tmp_path);
+   return 1;
 }
 
 int find_file(char *fname, struct inode dir, struct inode *file)
@@ -343,123 +350,6 @@ uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
 }
 
 
-/** Prints the file mode
- * ( it's disgusting I'm sorry :-[ ) -David
- * 
- * Apology not accepted -Luke
- */
-void print_mode(uint16_t mode)
-{
-   if(mode & MODE_DIR) 
-   {
-      printf("d");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_OR) 
-   {
-      printf("r");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_OW) 
-   {
-      printf("w");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_OX) 
-   {
-      printf("x");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_GR) 
-   {
-      printf("r");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_GW) 
-   {
-      printf("w");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_GX) 
-   {
-      printf("x");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_WR) 
-   {
-      printf("r");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_WW) 
-   {
-      printf("w");
-   }
-   else
-   {
-      printf("-");
-   }
-   if(mode & MODE_WX) 
-   {
-      printf("x");
-   }
-   else
-   {
-      printf("-");
-   }
-}
-
-
-/** Prints usage message. 
- * type is either TYPE_MINLS or TYPE_MINGET
- * name is always argv[0]
- */
-void print_usage(char* name, int type)
-{
-   if(type == TYPE_MINLS)
-   {
-      fprintf(stderr,
-         "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n",
-            name);
-   }
-   else if(type == TYPE_MINGET)
-   {
-      fprintf(stderr,
-         "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile "
-         "srcpath [ dstpath ]\n", name);
-   }
-   fprintf(stderr,"Options:\n");
-   fprintf(stderr,
-      "\t-p\t part\t --- select partition for filesystem (default: none)\n");
-   fprintf(stderr,
-      "\t-s\t sub\t --- select subpartition for filesystem (default: none)\n");
-   fprintf(stderr,"\t-h\t help\t --- print usage information and exit\n");
-   fprintf(stderr,"\t-v\t verbose --- increase verbosity level\n");
-}
-
 /** Parse command line options into an options structure.
  * argc is the same argc that is given to main
  * argv is the same argv that is given to main
@@ -471,6 +361,7 @@ void parse_options(int argc, char* argv[], int type, Options* opts)
    char ret;
    char* optstring = "-p:s:v";
    int str_arg = 0;
+   opts->image = NULL;
    if(argc == 1)
    {
       print_usage(argv[0], type);
@@ -545,5 +436,9 @@ void parse_options(int argc, char* argv[], int type, Options* opts)
       print_usage(argv[0], type);
       exit(EXIT_FAILURE);
    }
-   fs_base = 0;
-}
+   if(opts->image == NULL)
+   {
+      print_usage(argv[0], type);
+      exit(EXIT_FAILURE);
+   }
+}  
