@@ -22,8 +22,12 @@ int main(int argc, char* argv[])
    }
    
    find_fs(opts);
-   load_superblock();
+   load_superblock(opts);
    traverse_path(opts.srcpath, &file);
+   if(opts.verbose)
+   {
+      print_inode(file);
+   }
    copy_data(&file, opts.dstpath);
    return 0;
 }

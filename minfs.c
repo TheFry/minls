@@ -8,10 +8,7 @@ extern uint32_t fs_base;
 extern FILE *disk;
 extern struct superblock super_block;
 
-
-
-
-void load_superblock()
+void load_superblock(Options opts)
 {
    fseek(disk, SB_BASE, SEEK_SET);
    fread(&super_block, sizeof(struct superblock), 1, disk);
@@ -20,6 +17,10 @@ void load_superblock()
       fprintf(stderr, "Bad magic number. (0x%04X)\n", super_block.magic);
       fprintf(stderr, "This doesn't look like a MINIX filesystem.\n");
       exit(EXIT_FAILURE);
+   }
+   if(opts.verbose)
+   {
+      print_sb();
    }
 }
 
