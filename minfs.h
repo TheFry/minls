@@ -155,6 +155,7 @@ void read_zone(int num, void *buffer);
 uint32_t get_part(int pt_num);
 void find_fs(Options opts);
 int ls(struct inode dir, char *path);
+void copy_data(struct inode *, char *);
 void load_superblock();
 uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size);
 int traverse_path(char *path, struct inode *file);
