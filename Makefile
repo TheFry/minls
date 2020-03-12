@@ -21,11 +21,5 @@ minfs.o: minfs.c minfs.h
 minprint.o: minprint.c minfs.h
 	$(CC) $(CFLAGS) -c minprint.c
 
-test: test.o
-	$(CC) $(CFLAGS) -o test test.o
-
-test.o: test.c minfs.h
-	$(CC) $(CLFAGS) -c test.c
-
 clean:
-	rm -f minfs.o test test.o minls minget minls.o minget.o minprint.o
+	rm -f minfs.o minls minget minls.o minget.o minprint.o
