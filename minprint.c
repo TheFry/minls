@@ -167,7 +167,7 @@ void print_pt()
 
 void print_sb()
 {
-   fprintf(stderr, "Superblock Contents:\n");
+   fprintf(stderr, "\nSuperblock Contents:\n");
    fprintf(stderr, "Stored Fields:\n");
    fprintf(stderr, "  ninodes    %9d\n", super_block.ninodes);
    fprintf(stderr, "  i_blocks   %9d\n", super_block.i_blocks);
