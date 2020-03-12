@@ -74,7 +74,7 @@ void copy_data(struct inode *file, char *outdir)
 
 
    /* Check that the file given is a regular file */
-   if(!(file->mode & MODE_REG))
+   if(!(file->mode & MODE_REG) || (file->mode & MODE_LN))
    {
       fprintf(stderr, "Not a regular file\n");
       exit(EXIT_FAILURE);
