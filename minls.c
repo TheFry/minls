@@ -24,7 +24,10 @@ int main(int argc, char* argv[])
    {
       print_inode(dir);
    }
-   printf("%s:\n", opts.srcpath == NULL ? "/" : opts.srcpath);
+   if(dir.mode & MODE_DIR)
+   {
+      printf("%s:\n", opts.srcpath == NULL ? "/" : opts.srcpath);
+   }
    ls(dir, opts.srcpath);
    return 0;
 }
