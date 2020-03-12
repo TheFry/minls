@@ -285,8 +285,11 @@ uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size)
    while(b < size && c < NUM_ZONES_INDR)
    {
       read_zone(double_zone[c], zone);
+      printf("IND ZONE NUM[%d]: %d\n", c,double_zone[c]);
+      printf("Next: %d\n", double_zone[1]);
       while(b < size && i < NUM_ZONES_INDR)
       {
+         //printf("\tDIRECT ZONE NUM[%d]: %d\n", b, zone[i]);
          buff[b] = zone[i];
          ++b;
          ++i;

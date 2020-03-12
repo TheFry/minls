@@ -52,9 +52,9 @@
 #define INODE_SIZE 64
 #define INODE_TABLE_OFFSET (fs_base + (STATIC_BLOCKS + super_block.i_blocks + \
 super_block.z_blocks) * super_block.blocksize)
-#define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + (x - 1) * INODE_SIZE)
+#define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + ((x) - 1) * INODE_SIZE)
 #define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
-#define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * x))
+#define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * (x)))
 #define NUM_ZONES_INDR (super_block.blocksize / 32)
 
 #define ZONES_IN_FILE(size) (size % ZONE_SIZE > 0 ? \
