@@ -11,7 +11,7 @@ struct superblock super_block;
 int main(int argc, char* argv[])
 {
    struct inode dir;
-   Options opts = {FALSE, -1, -1, "", "", ""};
+   Options opts = {FALSE, -1, -1, NULL, NULL, NULL};
    parse_options(argc, argv, TYPE_MINLS, &opts);
    disk = fopen(opts.image, "r");
    if(disk == NULL){
@@ -19,7 +19,8 @@ int main(int argc, char* argv[])
    }
    find_fs(opts);
    load_superblock();
-   read_inode(ROOT_INODE, &dir);
-   ls(dir);
+   midnight_toker(opts.srcpath, &dir);
+   printf("%s:\n", opts.srcpath == NULL ? "/" : opts.srcpath);
+   ls(dir, opts.srcpath);
    return 0;
 }

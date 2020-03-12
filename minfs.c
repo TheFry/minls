@@ -91,14 +91,90 @@ uint32_t get_part(int pt_num)
       exit(EXIT_FAILURE);
    }
    /* Return fs start location */
-   printf("Valid Minix partition\n");
    return pt.lFirst;
 }
 
-
-/** No logic for multiple zones rn. Need to add that shit fam
+/** traverse_path:
+ * Traverses the path given and returns the inode of the
+ * file at the end of the path
+ * Makes a local copy of the path so it doesn't mess up the path that gets
+ * passed in
  */
-void ls(struct inode dir)
+void midnight_toker(char *path, struct inode *file)
+{
+   struct inode dir;
+   char *fname;   
+   char *tmp_path;
+   read_inode(ROOT_INODE, file);
+   dir = *file;
+   tmp_path = malloc(sizeof(char) * strlen(path));
+   strcpy(tmp_path, path);
+   fname = strtok(tmp_path, "/");
+   while(fname != NULL)
+   {
+      if(find_file(fname, dir, file) == -1)
+      {
+         fprintf(stderr, "%s: File not found\n", path);
+         exit(EXIT_FAILURE);
+      }
+      dir = *file;
+      fname = strtok(NULL, "/");
+   }
+}
+
+int find_file(char *fname, struct inode dir, struct inode *file)
+{
+   int zones, entries;
+   uint32_t *zone_nums;
+   int i, d;
+   int listed = 0;
+   struct dirent *directory;
+   if(!(dir.mode & MODE_DIR))
+   {
+      fprintf(stderr, "Not a directory\n");
+      return -1;
+   }
+   zones = ZONES_IN_FILE(dir.size);
+   directory = malloc(ZONE_SIZE);
+   zone_nums = malloc(sizeof(uint32_t) * zones);
+
+   entries = dir.size / DIRENT_SIZE;
+   get_zone_list(dir, zone_nums, zones);
+
+   for(i = 0; i < zones; i++)
+   {
+      read_zone(zone_nums[i], directory);
+      for(d = 0; d < (ZONE_SIZE / DIRENT_SIZE); d++)
+      {
+         if(listed >= entries)
+         {
+            free(directory);
+            free(zone_nums);
+            return -1;
+         }
+         if(directory[d].inumber != 0)
+         {
+            if(strncmp(fname, directory[d].name, 60) == 0)
+            {
+               read_inode(directory[d].inumber, file);
+               break;
+            }
+         }
+         listed++;
+      }
+   }
+   free(directory);
+   free(zone_nums);
+   return 1;
+} 
+
+
+/** Lists all the files in a directory 'dir'
+ * If the dir passed is actually just a file it shits the bed
+ * In that case print the mode and size then need to print the 
+ * srcpath at the end.
+ */
+int ls(struct inode dir, char *path)
 {
    int zones, entries;
    uint32_t *zone_nums;
@@ -106,6 +182,13 @@ void ls(struct inode dir)
    int listed = 0;
    struct dirent *directory;
    struct inode file;
+   
+   if(!(dir.mode & MODE_DIR))
+   {
+      print_mode(dir.mode);
+      printf(" %9d %s\n", dir.size, path);
+      return 0;
+   }
    zones = ZONES_IN_FILE(dir.size);
    directory = malloc(ZONE_SIZE);
    zone_nums = malloc(sizeof(uint32_t) * zones);
@@ -126,13 +209,14 @@ void ls(struct inode dir)
          {
             read_inode(directory[d].inumber, &file);
             print_mode(file.mode);
-            printf("\t%9d %s\n", file.size, directory[d].name);
+            printf(" %9d %s\n", file.size, directory[d].name);
          }
          listed++;
       }
    }
    free(directory);
    free(zone_nums);
+   return 0;
 } 
 
 
@@ -161,6 +245,8 @@ void read_inode(int num, struct inode *data)
 void read_zone(int num, void *buffer)
 {
    int offset = ADDRESS_OF_ZONE(num);
+   size_t ret;
+
    if(num == 0)
    {
       memset(buffer, 0, ZONE_SIZE);
@@ -172,8 +258,9 @@ void read_zone(int num, void *buffer)
          perror("Fseek read zone");
          exit(EXIT_FAILURE);
       }
-      if(fread(buffer, ZONE_SIZE, 1, disk) != 1)
+      if((ret = fread(buffer, ZONE_SIZE, 1, disk)) != 1)
       {
+         fprintf(stderr, "Ret: %zd\n", ret);
          perror("Fread read zone");
          exit(EXIT_FAILURE);
       }
