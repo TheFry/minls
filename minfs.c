@@ -212,7 +212,7 @@ void read_inode(int num, struct inode *data)
 /** Gets the zone based on a 0-indexed number.
  * Populates 'buffer' with the zone data
  */
-void read_zone(int num, void *buffer)
+void read_zone(uint32_t num, void *buffer)
 {
    uint32_t offset = ADDRESS_OF_ZONE(num);
    size_t ret;

@@ -152,7 +152,7 @@ void print_usage(char *name, int type);
 void parse_options(int argc, char* argv[], int type, Options *opts);
 void print_mode(uint16_t mode);
 void read_inode(int num, struct inode *data);
-void read_zone(int num, void *buffer);
+void read_zone(uint32_t num, void *buffer);
 uint32_t get_part(int pt_num);
 void find_fs(Options opts);
 int ls(struct inode dir, char *path);
