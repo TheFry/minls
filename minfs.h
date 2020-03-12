@@ -22,6 +22,8 @@
 0000002 Other write permission
 0000001 Other execute permission
 */
+
+/* File mode macros */
 #define MODE_DIR  0040000
 #define MODE_REG  0100000
 #define MODE_LN   0120000
@@ -35,36 +37,47 @@
 #define MODE_WW   0000002 
 #define MODE_WX   0000001 
 
+/* Gets bottom 6 bits from sec value */
 #define SEC_MASK 0x3F
 
-#define T_PATH "./test_fs"
+/* Superblock related Macros */
 #define SB_OFFSET 1024
-#define PT_OFFSET 0x1BE
 /* Use this whenever reading the superblock */
 #define SB_BASE (fs_base + SB_OFFSET)
+
+/* Partition table realated macros */
+#define PT_OFFSET 0x1BE
 /* Use this whenever reading the partition table */
 #define PT_BASE (fs_base + PT_OFFSET)
-#define SECTOR_SIZE 512
-#define STATIC_BLOCKS 2
-#define ROOT_INODE 1
-#define MINIX_PART_TYPE 0x81
-#define PT_MAGIC_NUM 0xAA55
-#define MINIX_MAGIC_NUM 0x4D5A
-#define INODE_SIZE 64
+#define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
+#define PT_ENTRIES 4
+#define PT_MAGIC_NUM_OFFSET 510
+
+/* Inode related macros */
 #define INODE_TABLE_OFFSET (fs_base + (STATIC_BLOCKS + super_block.i_blocks + \
 super_block.z_blocks) * super_block.blocksize)
 #define ADDRESS_OF_INODE(x) (INODE_TABLE_OFFSET + ((x) - 1) * INODE_SIZE)
+#define ROOT_INODE 1
+
+/* Magic Numbers */
+#define MINIX_PART_TYPE 0x81
+#define PT_MAGIC_NUM 0xAA55
+#define MINIX_MAGIC_NUM 0x4D5A
+
+/* Data structure sizes */
+#define SECTOR_SIZE 512
+#define INODE_SIZE 64
+#define STATIC_BLOCKS 2
+#define DIRENT_SIZE 64
+
+/* Zone related macros */
 #define ZONE_SIZE (super_block.blocksize << super_block.log_zone_size)
 #define ADDRESS_OF_ZONE(x) (fs_base + (ZONE_SIZE * (x)))
 #define NUM_ZONES_INDR (super_block.blocksize / 32)
-
 #define ZONES_IN_FILE(size) (size % ZONE_SIZE > 0 ? \
 (size / ZONE_SIZE) + 1 : size / ZONE_SIZE)
 
-#define DIRENT_SIZE 64
-#define PT_MAGIC_NUM_OFFSET 510
-#define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
-#define PT_ENTRIES 4
+/* Other useful macros */
 #define TRUE 1 
 #define FALSE 0
 #define TYPE_MINLS 0x10
