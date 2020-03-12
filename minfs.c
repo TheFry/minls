@@ -29,11 +29,21 @@ void find_fs(Options opts)
    uint32_t lFirst;
    if(opts.part >= 0)
    {
+      if(opts.verbose)
+      {
+         fprintf(stderr, "Partition table:\n");
+         print_pt();
+      }
       lFirst = get_part(opts.part);
       fs_base = (SECTOR_SIZE * lFirst);
    }
    if(opts.subpart >= 0)
    {
+      if(opts.verbose)
+      {
+         fprintf(stderr, "Subpartition table:\n");
+         print_pt();
+      }
       lFirst = get_part(opts.subpart);
       fs_base = (SECTOR_SIZE * lFirst);
    }
@@ -376,7 +386,7 @@ void parse_options(int argc, char* argv[], int type, Options* opts)
       else if(ret == 'p')
       {
          opts->part = (int) strtol(optarg, NULL, 10);
-         if(opts->part > 3 || opts->part < 0)
+         if(opts->part >= PT_ENTRIES || opts->part < 0)
          {
             fprintf(stderr, "Partition %d out of range. Must be 0..3.\n",
                opts->part);
@@ -387,7 +397,7 @@ void parse_options(int argc, char* argv[], int type, Options* opts)
       else if(ret == 's')
       {
          opts->subpart = (int) strtol(optarg, NULL, 10);
-         if(opts->subpart > 3 || opts->subpart < 0)
+         if(opts->subpart >= PT_ENTRIES || opts->subpart < 0)
          {
             fprintf(stderr, "Subpartition %d out of range. Must be 0..3.\n",
                opts->subpart);

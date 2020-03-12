@@ -34,6 +34,8 @@
 #define MODE_WW   0000002 
 #define MODE_WX   0000001 
 
+#define SEC_MASK 0x3F
+
 #define T_PATH "./test_fs"
 #define SB_OFFSET 1024
 #define PT_OFFSET 0x1BE
@@ -61,6 +63,7 @@ super_block.z_blocks) * super_block.blocksize)
 #define DIRENT_SIZE 64
 #define PT_MAGIC_NUM_OFFSET 510
 #define PT_MAGIC_NUM_LOCATION (fs_base + PT_MAGIC_NUM_OFFSET)
+#define PT_ENTRIES 4
 #define TRUE 1 
 #define FALSE 0
 #define TYPE_MINLS 0x10
@@ -156,3 +159,6 @@ void load_superblock();
 uint32_t get_zone_list(struct inode node, uint32_t *buff, uint32_t size);
 int traverse_path(char *path, struct inode *file);
 int find_file(char *fname, struct inode dir, struct inode *file);
+void print_pt();
+void print_superblock();
+void print_inode(struct inode node);
