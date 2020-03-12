@@ -122,7 +122,7 @@ int traverse_path(char *path, struct inode *file)
       return 1;
    }
    dir = *file;
-   tmp_path = malloc(sizeof(char) * strlen(path));
+   tmp_path = malloc(sizeof(char) * (strlen(path) + 2));
    strcpy(tmp_path, path);
    fname = strtok(tmp_path, "/");
    while(fname != NULL)
@@ -175,7 +175,7 @@ int find_file(char *fname, struct inode dir, struct inode *file)
             if(strncmp(fname, directory[d].name, 60) == 0)
             {
                read_inode(directory[d].inumber, file);
-               break;
+               return 1;
             }
          }
          listed++;
