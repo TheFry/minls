@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
    }
    find_fs(opts);
    load_superblock();
-   midnight_toker(opts.srcpath, &dir);
+   traverse_path(opts.srcpath, &dir);
    printf("%s:\n", opts.srcpath == NULL ? "/" : opts.srcpath);
    ls(dir, opts.srcpath);
    return 0;

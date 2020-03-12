@@ -100,7 +100,7 @@ uint32_t get_part(int pt_num)
  * Makes a local copy of the path so it doesn't mess up the path that gets
  * passed in
  */
-void midnight_toker(char *path, struct inode *file)
+void traverse_path(char *path, struct inode *file)
 {
    struct inode dir;
    char *fname;   
