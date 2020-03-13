@@ -73,7 +73,7 @@ void copy_data(struct inode *file, char *outdir)
 
 
    /* Check that the file given is a regular file */
-   if(!(file->mode & MODE_REG))
+   if((file->mode & MODE_LN) != MODE_REG)
    {
       free(zone_nums);
       free(buff);
